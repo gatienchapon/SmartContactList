@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.GridView;
+import android.widget.TextView;
 
 public class ContactActivity extends AppCompatActivity {
 
@@ -16,6 +17,10 @@ public class ContactActivity extends AppCompatActivity {
         ContactAdapter contactAdapter = new ContactAdapter(this, R.layout.activity_contact,contactHistory.getContactHistory());
         GridView gridView = (GridView)findViewById(R.id.list_item);
         gridView.setAdapter(contactAdapter);
+
+        //Entete
+        TextView entete = (TextView)findViewById(R.id.historyLength);
+        entete.setText("Longueur historique : "+ contactHistory.getContactHistory().size());
 
     }
 }

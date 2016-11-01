@@ -10,6 +10,12 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="fr.unice.polytech.smartcontactlistapp.ContactActivity">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/historyLength"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="4dp"/>
     <GridView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -17,6 +23,7 @@
         android:layout_alignParentTop="true"
         android:id="@+id/list_item"
         android:layout_centerHorizontal="true"
-        android:layout_margin="15dp">
+        android:layout_margin="15dp"
+        android:layout_below="@id/historyLength">
     </GridView>
 </RelativeLayout>
