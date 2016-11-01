@@ -10,8 +10,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="fr.unice.polytech.smartcontactlistapp.ContactActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!" />
+    <GridView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:verticalSpacing="10dp"
+        android:layout_alignParentTop="true"
+        android:id="@+id/list_item"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="15dp">
+    </GridView>
 </RelativeLayout>
