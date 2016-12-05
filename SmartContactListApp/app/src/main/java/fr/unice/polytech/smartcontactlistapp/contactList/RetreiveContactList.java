@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.ContactsContract;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -31,8 +32,7 @@ public class RetreiveContactList {
             String name = cur.getString(cur.getColumnIndex(
                     ContactsContract.Contacts.DISPLAY_NAME));
 
-            if (cur.getInt(cur.getColumnIndex(
-                    ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
+            if (cur.getInt(cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER)) > 0) {
                 Cursor pCur = cr.query(
                         ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
                         null,

@@ -1,4 +1,4 @@
-package fr.unice.polytech.smartcontactlistapp;
+package fr.unice.polytech.smartcontactlistapp.historyList;
 
 import android.Manifest;
 import android.content.Context;

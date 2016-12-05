@@ -1,4 +1,4 @@
-package fr.unice.polytech.smartcontactlistapp;
+package fr.unice.polytech.smartcontactlistapp.historyList;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -9,6 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.List;
+
+import fr.unice.polytech.smartcontactlistapp.R;
 
 /**
  * Created by chapon on 01/11/16.
