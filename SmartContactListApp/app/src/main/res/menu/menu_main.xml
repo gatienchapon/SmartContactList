@@ -1,0 +1,20 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="fr.unice.polytech.myapplication.MainActivity">
+    <item
+        android:id="@+id/accueil"
+        android:orderInCategory="100"
+        android:title="Accueil"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/journal_appel"
+        android:orderInCategory="100"
+        android:title="Journal Appels"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/synchronisation"
+        android:orderInCategory="100"
+        android:title="Synchronisation"
+        app:showAsAction="never" />
+</menu>
