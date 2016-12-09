@@ -5,18 +5,29 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Synchronisation"
-        android:id="@+id/synchronisation_button"
+        android:text="Send"
+        android:id="@+id/send_button"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"/>
     <ProgressBar
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/progress"
+        android:id="@+id/progressSend"
+        android:layout_toRightOf="@id/send_button"
+        android:layout_centerVertical="true"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Synchronisation"
+        android:id="@+id/synchronisation"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:max="100"
-        android:progress="0"
-        android:layout_below="@id/synchronisation_button"/>
+        android:layout_below="@id/send_button"/>
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressSynchronised"
+        android:layout_toRightOf="@id/synchronisation"
+        android:layout_alignBottom="@id/synchronisation"/>
 </RelativeLayout>

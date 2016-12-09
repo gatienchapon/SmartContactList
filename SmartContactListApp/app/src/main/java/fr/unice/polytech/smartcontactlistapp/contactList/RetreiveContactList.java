@@ -41,7 +41,7 @@ public class RetreiveContactList {
                 while (pCur.moveToNext()) {
                     String phoneNo = pCur.getString(pCur.getColumnIndex(
                             ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    listContact.add(new Contact(name,phoneNo));
+                    listContact.add(new Contact(name,phoneNo, "100%"));
 
                 }
                 pCur.close();

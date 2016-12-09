@@ -14,12 +14,16 @@ import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -34,83 +38,45 @@ import fr.unice.polytech.smartcontactlistapp.historyList.ContactHistory;
 
 public class SynchronisationActivity extends AppCompatActivity {
 
-    private ProgressBar bar;
+    private ProgressBar barSend;
+    private ProgressBar barSynchronisation;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.synchronisation_activity);
-        Button button = (Button)findViewById(R.id.synchronisation_button);
-        bar = (ProgressBar)findViewById(R.id.progress);
-        button.setOnClickListener(new View.OnClickListener() {
+        final Button synchronisation = (Button)findViewById(R.id.synchronisation);
+        Button send = (Button)findViewById(R.id.send_button);
+        barSend = (ProgressBar)findViewById(R.id.progressSend);
+        barSynchronisation = (ProgressBar)findViewById(R.id.progressSynchronised);
+        barSend.setVisibility(View.INVISIBLE);
+        barSynchronisation.setVisibility(View.INVISIBLE);
+        send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 contactServer();
             }
         });
+        synchronisation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                synchronisation();
+            }
+        });
+    }
+
+    private void synchronisation() {
+        SynchronisationTask s;
+        s = new SynchronisationTask(this, barSynchronisation);
+        s.execute((Void)null);
     }
 
     private void contactServer() {
         SendTask send;
-        send = new SendTask(this);
+        send = new SendTask(this,barSend);
         send.execute((Void) null);
     }
 
-    public class SendTask extends AsyncTask<Void, Void, Boolean> {
-        Context context;
 
-        SendTask(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            JSONObject json = new JSONObject();
-            try {
-                json.put("name", "gatien");
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            URL url = null;
-            try {
-                url = new URL("http://192.168.0.41:5000/call/");
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("Accept", "application/json");
-                connection.setRequestMethod("POST");
-                connection.setRequestMethod("GET");
-                connection.setDoOutput(true);
-                connection.setDoInput(true);
-                connection.setRequestProperty("Connection", "Keep-Alive");
-                DataOutputStream content = new DataOutputStream(connection.getOutputStream());
-                content.writeBytes(json.toString());
-                Log.d("Code", "" + connection.getResponseCode());
-                Log.d("retour",connection.getResponseMessage());
-
-                content.close();
-                connection.disconnect();
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(final Boolean success) {
-            if (success) {
-                Log.d("Bien", "envoyé");
-            } else {
-                Log.d("Erreur", "Envoi");
-            }
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            Log.d("Progress", ""+values);
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

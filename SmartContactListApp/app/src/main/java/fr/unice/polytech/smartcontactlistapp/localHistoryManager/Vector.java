@@ -8,6 +8,8 @@ import java.util.Date;
  */
 
 public class Vector {
+    public static String[] classes = {"Year","Month","DayNumber","DayWeek","Hour","Minute","Seconde","SlotTime","Class"};
+
     private String year;
     private String month;
     private String numberDay;

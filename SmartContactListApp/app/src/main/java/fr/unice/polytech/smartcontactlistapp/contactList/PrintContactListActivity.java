@@ -32,6 +32,10 @@ import fr.unice.polytech.smartcontactlistapp.historyList.ContactActivity;
 import fr.unice.polytech.smartcontactlistapp.localHistoryManager.ManageLocalFile;
 import fr.unice.polytech.smartcontactlistapp.synchronisation.SynchronisationActivity;
 
+import static fr.unice.polytech.smartcontactlistapp.DB.DB.contact_list_application;
+import static fr.unice.polytech.smartcontactlistapp.DB.DB.contact_list_mobile;
+import static fr.unice.polytech.smartcontactlistapp.DB.DB.init_contact_list_application;
+
 /**
  * Created by chapon on 04/11/16.
  */
@@ -39,7 +43,6 @@ import fr.unice.polytech.smartcontactlistapp.synchronisation.SynchronisationActi
 public class PrintContactListActivity  extends AppCompatActivity {
 
     private StaggeredGridLayoutManager gaggeredGridLayoutManager;
-    public static List<Contact> listContact;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,58 +54,16 @@ public class PrintContactListActivity  extends AppCompatActivity {
         gaggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
         recyclerView.setLayoutManager(gaggeredGridLayoutManager);
 
-        listContact = getListItemData();
-
-        SolventRecyclerViewAdapter rcAdapter = new SolventRecyclerViewAdapter(this, listContact);
+        contact_list_mobile = getListItemData();
+        init_contact_list_application(this);
+        SolventRecyclerViewAdapter rcAdapter = new SolventRecyclerViewAdapter(this, contact_list_application);
         recyclerView.setAdapter(rcAdapter);
 
 
         new ManageLocalFile(this);
     }
 
-    private byte[] readFile(File file) {
-        int length = (int) file.length();
 
-        byte[] bytes = new byte[length];
-
-        FileInputStream in = null;
-        try {
-            in = new FileInputStream(file);
-            in.read(bytes);
-            in.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return bytes;
-    }
-
-    private void writeToFile(File file, String texte) {
-        int length = (int) file.length();
-        byte[] toWrite= texte.getBytes();
-        int sizeToWrite = toWrite.length;
-        byte[] bytes = new byte[length+sizeToWrite];
-        byte[] alreadyFilled = readFile(file);
-        for(int i=0; i<alreadyFilled.length; i++){
-            bytes[i] = alreadyFilled[i];
-        }
-        //On concatene le reste
-
-        for(int i=0; i<sizeToWrite; i++){
-            bytes[length +i] = toWrite[i];
-        }
-        FileOutputStream stream = null;
-        try {
-            stream = new FileOutputStream(file);
-            stream.write(bytes);
-            stream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     private List<Contact> getListItemData(){
         RetreiveContactList retreiveContactList= new RetreiveContactList();
