@@ -13,7 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -38,7 +37,7 @@ public class DB {
             for(int i=0; i<contact_list_mobile.size(); i++){
                 Contact c = contact_list_mobile.get(i);
                 String ligne = c.name+","+c.numero+","+c.percentage+"\n";
-                writeToFile(file, ligne);
+                writeToFile(file, ligne, false);
             }
             contact_list_application = contact_list_mobile;
         }else{
@@ -47,7 +46,8 @@ public class DB {
             contact_list_application = new ArrayList<>();
             for(int i=0; i<general.length; i++){
                     String[] col = general[i].split(",");
-                    contact_list_application.add(new Contact(col[0], col[1], col[2]));
+                    if(col.length>=3)
+                        contact_list_application.add(new Contact(col[0], col[1], col[2]));
             }
             sortFileByPercentage();
         }
@@ -56,10 +56,9 @@ public class DB {
 
     public static void synchronise_contact_list_application(JSONArray json, Context context){
         File path = context.getFilesDir();
-        File fileOld = new File(path, "contact_list_application.txt");
-        fileOld.delete();
         File file = new File(path, "contact_list_application.txt");
         contact_list_application = new ArrayList<>();
+        boolean erase = true;
         for(int i=0; i<json.length(); i++){
             try {
                 JSONObject jsonObject = json.getJSONObject(i);
@@ -70,7 +69,8 @@ public class DB {
                 contact_list_application.add(c);
 
                 String ligne = c.name+","+c.numero+","+c.percentage+"\n";
-                writeToFile(file, ligne);
+                writeToFile(file, ligne, erase);
+                erase = false;
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -115,20 +115,29 @@ public class DB {
         return bytes;
     }
 
-    public static void writeToFile(File file, String texte) {
+    public static void writeToFile(File file, String texte, boolean erase) {
         int length = (int) file.length();
         byte[] toWrite= texte.getBytes();
         int sizeToWrite = toWrite.length;
-        byte[] bytes = new byte[length+sizeToWrite];
-        byte[] alreadyFilled = readFile(file);
-        for(int i=0; i<alreadyFilled.length; i++){
-            bytes[i] = alreadyFilled[i];
+        byte[] bytes;
+        if(!erase) {
+            bytes = new byte[length + sizeToWrite];
+            byte[] alreadyFilled = readFile(file);
+            for(int i=0; i<alreadyFilled.length; i++){
+                bytes[i] = alreadyFilled[i];
+            }
+            //On concatene le reste
+            for(int i=0; i<sizeToWrite; i++){
+                bytes[length +i] = toWrite[i];
+            }
         }
-        //On concatene le reste
+        else {
+            bytes = new byte[length];
+            for(int i=0; i<sizeToWrite; i++){
+                bytes[i] = toWrite[i];
+            }
+        }
 
-        for(int i=0; i<sizeToWrite; i++){
-            bytes[length +i] = toWrite[i];
-        }
         FileOutputStream stream = null;
         try {
             stream = new FileOutputStream(file);

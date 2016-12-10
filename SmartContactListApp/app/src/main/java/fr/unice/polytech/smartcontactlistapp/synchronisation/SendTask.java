@@ -90,10 +90,8 @@ public class SendTask extends AsyncTask<Void, Void, Boolean> {
                 String[] col = s[i].split(",");
                 String[] classe = Vector.classes;
                 for(int iter =0; iter<col.length; iter++){
-
                     j.accumulate(classe[iter],col[iter]);
                 }
-
                 jsonArray.put(j);
             } catch (JSONException e) {
                 e.printStackTrace();
