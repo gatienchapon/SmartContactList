@@ -20,8 +20,12 @@ def add_call():
     Classifier.classify()
     return jsonify({"retour":"super"})
 
-@app.route('/predict', methods=['GET'])
+@app.route('/predict/', methods=['POST'])
 def get_tasks():
+    content = request.json
+    content = content['request']
+    df = pd.DataFrame(data = content)
+    df.to_csv('dataset/testFile.txt',index=False)
     return jsonify(Classifier.predicte('dataset/testFile.txt'))
 
 if __name__ == '__main__':
