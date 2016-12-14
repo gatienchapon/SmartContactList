@@ -15,11 +15,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 
 import fr.unice.polytech.smartcontactlistapp.localHistoryManager.Vector;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 public class SendTask extends AsyncTask<Void, Void, Boolean> {
@@ -58,19 +61,18 @@ public class SendTask extends AsyncTask<Void, Void, Boolean> {
 
         URL url = null;
         try {
-            url = new URL("http://192.168.0.41:5000/call/");
+            url = new URL("http://192.168.1.145:5000/call/");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json");
             connection.setRequestMethod("POST");
             connection.setDoOutput(true);
             connection.setDoInput(true);
-            connection.setRequestProperty("Connection", "Keep-Alive");
             DataOutputStream content = new DataOutputStream(connection.getOutputStream());
+            Log.d("Envoie", json.toString());
             content.writeBytes(json.toString());
             Log.d("Code", "" + connection.getResponseCode());
             Log.d("retour",connection.getResponseMessage());
-
             content.close();
             connection.disconnect();
         } catch (MalformedURLException e) {
@@ -90,7 +92,13 @@ public class SendTask extends AsyncTask<Void, Void, Boolean> {
                 String[] col = s[i].split(",");
                 String[] classe = Vector.classes;
                 for(int iter =0; iter<col.length; iter++){
-                    j.accumulate(classe[iter],col[iter]);
+                    if (iter == col.length-1) {
+                        String c = col[iter];
+                        c = c.replace('é','e');
+                        j.put(classe[iter], c);
+                    }
+                    else
+                        j.put(classe[iter],col[iter]);
                 }
                 jsonArray.put(j);
             } catch (JSONException e) {

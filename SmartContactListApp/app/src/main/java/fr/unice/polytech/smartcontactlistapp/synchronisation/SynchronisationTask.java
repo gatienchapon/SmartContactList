@@ -51,7 +51,7 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
 
         URL url = null;
         try {
-            url = new URL("http://192.168.0.41:5000/predict/");
+            url = new URL("http://192.168.1.145:5000/predict/");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json");
