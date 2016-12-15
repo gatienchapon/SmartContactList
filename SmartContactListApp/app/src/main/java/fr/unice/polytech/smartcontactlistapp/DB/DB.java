@@ -65,7 +65,16 @@ public class DB {
                 double score = Double.parseDouble(jsonObject.getString("score"));
                 score = score*100;
                 String result = String.format("%.0f", score);
-                Contact c = new Contact(jsonObject.getString("name"),result+"%");
+                String name = jsonObject.getString("name");
+                String numero= "";
+                for( Contact c : contact_list_mobile){
+                    String nameMobile = c.name;
+                    nameMobile = nameMobile.replace('é','e');
+                    if(nameMobile.equals(name)){
+                        numero = c.numero;
+                    }
+                }
+                Contact c = new Contact(jsonObject.getString("name"),numero,result+"%");
                 contact_list_application.add(c);
 
                 String ligne = c.name+","+c.numero+","+c.percentage+"\n";
