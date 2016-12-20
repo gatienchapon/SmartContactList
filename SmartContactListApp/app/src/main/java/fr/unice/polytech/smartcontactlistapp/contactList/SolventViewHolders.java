@@ -9,8 +9,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.List;
+
 import fr.unice.polytech.smartcontactlistapp.R;
 
+import static fr.unice.polytech.smartcontactlistapp.DB.DB.contact_list_application;
 import static fr.unice.polytech.smartcontactlistapp.DB.DB.contact_list_mobile;
 
 public class SolventViewHolders extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -33,8 +36,10 @@ public class SolventViewHolders extends RecyclerView.ViewHolder implements View.
 
     @Override
     public void onClick(View view) {
+
         Toast.makeText(view.getContext(), "Clicked Position = " + getPosition(), Toast.LENGTH_SHORT).show();
-        String numero = contact_list_mobile.get(getPosition()).numero;
+        String numero = contact_list_application.get(getPosition()).numero;
+
         Intent i = new Intent(Intent.ACTION_DIAL);
         String p = "tel:" + numero;
         i.setData(Uri.parse(p));
