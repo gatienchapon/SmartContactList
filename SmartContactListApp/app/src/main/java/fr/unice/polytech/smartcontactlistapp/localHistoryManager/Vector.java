@@ -17,6 +17,11 @@ public class Vector {
     private String hour;
     private String minute;
     private String seconde;
+
+    public String getTimeSlot() {
+        return timeSlot;
+    }
+
     private String timeSlot;
     private String contactName;
 
@@ -36,7 +41,7 @@ public class Vector {
     }
 
     public void fillTimeSlot(int hour){
-        String[] slots = {"0810","1012","1214","1416","1618","1820","2022","2200","0006","0608"};
+        String[] slots = {"810","1012","1214","1416","1618","1820","2022","2200","6","608"};
         if(hour >= 8 && hour <10){
             timeSlot = slots[0];
         }else if(hour >= 10 && hour <12){

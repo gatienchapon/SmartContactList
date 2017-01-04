@@ -56,7 +56,7 @@ public class SynchronisationActivity extends AppCompatActivity {
         barSend.setVisibility(View.INVISIBLE);
         barSynchronisation.setVisibility(View.INVISIBLE);
         ServerAdress = (EditText) findViewById(R.id.editAdress);
-        //
+
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

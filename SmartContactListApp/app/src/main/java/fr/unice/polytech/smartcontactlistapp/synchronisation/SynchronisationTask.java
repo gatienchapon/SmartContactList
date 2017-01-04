@@ -61,7 +61,8 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
             connection.setDoInput(true);
             connection.connect();
             DataOutputStream contentSend = new DataOutputStream(connection.getOutputStream());
-            JSONObject json  = fillJsonArray();
+            Vector v = new Vector(new Date(), "coucou");
+            JSONObject json  = fillJsonArray(v);
             contentSend.writeBytes(json.toString());
 
             int statusCode = connection.getResponseCode();
@@ -71,8 +72,9 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
                 StringBuilder responseStrBuilder = new StringBuilder();
                 while ((inputStr = content.readLine()) != null)
                     responseStrBuilder.append(inputStr);
-                JSONArray j = new JSONArray(responseStrBuilder.toString());
-                synchronise_contact_list_application(j, context);
+                JSONObject j = new JSONObject(responseStrBuilder.toString());
+                Log.d("Recu", j.toString());
+                synchronise_contact_list_application(j.getJSONArray(v.getTimeSlot()), context);
                 content.close();
             }
             contentSend.close();
@@ -90,10 +92,10 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
     /*
     On remplit un vecteur contenant la date du jour
      */
-    private JSONObject fillJsonArray() {
+    private JSONObject fillJsonArray(Vector v) {
         JSONObject toSend = new JSONObject();
         JSONArray jsonArray = new JSONArray();
-        Vector v = new Vector(new Date(), "coucou");
+
         String s = v.toString();
         JSONObject j = new JSONObject();
         try {
