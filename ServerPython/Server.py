@@ -5,6 +5,7 @@ import pandas as pd
 import time
 import json
 import distutils.dir_util
+import netifaces as ni
 
 from randomForest import randomForest
 
@@ -35,6 +36,10 @@ def get_tasks():
     return jsonify(Classifier.predicte(path))
 
 if __name__ == '__main__':
+    if 2 in ni.ifaddresses('wlan0'):
+        print "wlan0 IP : %s" % ni.ifaddresses('wlan0')[2][0]['addr']
+    if 2 in ni.ifaddresses('eth0'):
+        print "eth0 IP : %s" % ni.ifaddresses('eth0')[2][0]['addr']
     app.run(
             host="0.0.0.0",
             port=int("5000")
