@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -40,6 +42,9 @@ public class SynchronisationActivity extends AppCompatActivity {
 
     private ProgressBar barSend;
     private ProgressBar barSynchronisation;
+    private EditText ServerAdress;
+    public static String ipAdress="192.168.1.145";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,15 +55,23 @@ public class SynchronisationActivity extends AppCompatActivity {
         barSynchronisation = (ProgressBar)findViewById(R.id.progressSynchronised);
         barSend.setVisibility(View.INVISIBLE);
         barSynchronisation.setVisibility(View.INVISIBLE);
+        ServerAdress = (EditText) findViewById(R.id.editAdress);
+        //
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (! TextUtils.isEmpty(ServerAdress.getText().toString())){
+                    ipAdress = ServerAdress.getText().toString();
+                }
                 contactServer();
             }
         });
         synchronisation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if ( ! TextUtils.isEmpty(ServerAdress.getText().toString())){
+                    ipAdress = ServerAdress.getText().toString();
+                }
                 synchronisation();
             }
         });

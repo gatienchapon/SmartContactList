@@ -35,7 +35,6 @@ import static fr.unice.polytech.smartcontactlistapp.DB.DB.synchronise_contact_li
 public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
     Context context;
     ProgressBar bar;
-
     SynchronisationTask(Context context, ProgressBar bar) {
         this.context = context;
         this.bar = bar;
@@ -51,7 +50,8 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
 
         URL url = null;
         try {
-            url = new URL("http://192.168.1.145:5000/predict/");
+            Log.d("DEBUG", "ipadress dans task :"+SynchronisationActivity.ipAdress+" ");
+            url = new URL("http://"+SynchronisationActivity.ipAdress+":5000/predict/");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json");

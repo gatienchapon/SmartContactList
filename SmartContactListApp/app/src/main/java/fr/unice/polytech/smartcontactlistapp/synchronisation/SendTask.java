@@ -62,7 +62,9 @@ public class SendTask extends AsyncTask<Void, Void, Boolean> {
 
         URL url = null;
         try {
-            url = new URL("http://192.168.1.145:5000/call/");
+            Log.d("DEBUG", "ipadress dans send :"+SynchronisationActivity.ipAdress+" ");
+
+            url = new URL("http://"+SynchronisationActivity.ipAdress+":5000/call/");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json");
