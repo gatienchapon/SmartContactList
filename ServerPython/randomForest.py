@@ -25,8 +25,32 @@ def initAllContactNbCallBySlotTime(train, uniqueClassList):
         train[str(uniqueCall)] =0
 
 
+def fillTestFile(test, path, correspondance):
 
+    id_Contact = correspondance['numero']
+    initAllContactNbCallBySlotTime(test, id_Contact)
 
+    slottime_target = test['SlotTime'][0]
+    allSlotTimes = [6,608,810,1012,1214,1416,1618,1820,2022,2200]
+    hours = {'6':'00','608':'06','810':'08','1012':'10','1214':'12','1416':'14','1618':'16','1820':'18','2022':'22','2200':'22'}
+    j=0
+    for contact_current in id_Contact:
+        test[str(contact_current)][0] = correspondance[str(slottime_target)][j]
+        j=j+1
+    for current_slot_time in allSlotTimes:
+        if slottime_target != current_slot_time:
+            line = {}
+            for t in test:
+                if t != 'SlotTime' and t !='Hour':
+                    line[str(t)] = test[str(t)][0]
+            line['SlotTime'] = current_slot_time
+            line['Hour'] = hours[str(current_slot_time)]
+            j =0
+            for contact_current in id_Contact:
+                line[str(contact_current)] = correspondance[str(current_slot_time)][j]
+                j=j+1
+            test =test.append(line, ignore_index=True)
+    return test
 
 class randomForest:
     def __init__(self):
@@ -71,25 +95,21 @@ class randomForest:
     def predicte(self, path):
         LocationTest = path+'/testFile.txt'
         test = pd.read_csv(LocationTest)
-        df = pd.read_csv(path+'/correspondance.txt')
-        id_Contact = df['numero']
-        initAllContactNbCallBySlotTime(test, id_Contact)
-        i =0
-        for contact_current in id_Contact:
-            slottime_target = test['SlotTime'][0]
-            test[str(contact_current)][0] = df[str(slottime_target)][i]
-            i=i+1
-        print test
-        Y_pred = self.random_forest.predict_proba(test)
-        resultatFinal = []
-
-        names = df['name']
-        i =0
-        for proba in Y_pred[0]:
-            resultatFinal.append({"name":names[i],"score":proba})
-            i=i+1
+        correspondance = pd.read_csv(path+'/correspondance.txt')
+        test = fillTestFile(test, path, correspondance)
+        resultatFinal = {}
+        for index, row in test.iterrows():
+            currentSlotTime = row['SlotTime']
+            row = row.reshape(1,-1)
+            Y_pred = self.random_forest.predict_proba(row)
+            names = correspondance['name']
+            i =0
+            resultatFinal[str(currentSlotTime)] = []
+            for proba in Y_pred[0]:
+                resultatFinal[str(currentSlotTime)].append({"name":names[i],"score":proba})
+                i=i+1
         df = pd.DataFrame(data = test)
         df.to_csv(path+'/testFile.txt',index=False)
+        print resultatFinal
         return resultatFinal
-
 
