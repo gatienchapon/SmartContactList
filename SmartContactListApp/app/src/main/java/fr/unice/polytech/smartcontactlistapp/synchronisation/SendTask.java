@@ -19,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.Normalizer;
 
 import fr.unice.polytech.smartcontactlistapp.localHistoryManager.Vector;
 
@@ -83,6 +84,9 @@ public class SendTask extends AsyncTask<Void, Void, Boolean> {
         return true;
     }
 
+    private String removeAccent(String source) {
+        return Normalizer.normalize(source, Normalizer.Form.NFD).replaceAll("[\u0300-\u036F]", "");
+    }
     private JSONObject createJson(String[] s) {
         JSONObject json = new JSONObject();
         JSONArray jsonArray = new JSONArray();
@@ -94,7 +98,8 @@ public class SendTask extends AsyncTask<Void, Void, Boolean> {
                 for(int iter =0; iter<col.length; iter++){
                     if (iter == col.length-1) {
                         String c = col[iter];
-                        c = c.replace('é','e');
+                        c = removeAccent(c);
+                        //c = c.replace('ë','e');
                         j.put(classe[iter], c);
                     }
                     else

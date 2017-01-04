@@ -69,7 +69,7 @@ public class DB {
                 String numero= "";
                 for( Contact c : contact_list_mobile){
                     String nameMobile = c.name;
-                    nameMobile = nameMobile.replace('é','e');
+                    //nameMobile = nameMobile.replace('é','e');
                     if(nameMobile.equals(name)){
                         numero = c.numero;
                     }
