@@ -52,6 +52,7 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
         try {
             Log.d("DEBUG", "ipadress dans task :"+SynchronisationActivity.ipAdress+" ");
             url = new URL("http://"+SynchronisationActivity.ipAdress+":5000/predict/");
+            Log.d("HOST","http://"+SynchronisationActivity.ipAdress+":5000/predict/");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json");
@@ -73,8 +74,8 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
                 while ((inputStr = content.readLine()) != null)
                     responseStrBuilder.append(inputStr);
                 JSONObject j = new JSONObject(responseStrBuilder.toString());
-                Log.d("Recu", j.toString());
-                synchronise_contact_list_application(j.getJSONArray(v.getTimeSlot()), context);
+                Log.d("JSON", j.toString());
+                synchronise_contact_list_application(j, context);
                 content.close();
             }
             contentSend.close();

@@ -15,9 +15,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import fr.unice.polytech.smartcontactlistapp.contactList.Contact;
+import fr.unice.polytech.smartcontactlistapp.localHistoryManager.Vector;
 
 /**
  * Created by chapon on 09/12/16.
@@ -29,8 +31,10 @@ public class DB {
 
 
     public static void init_contact_list_application(Context context){
+        Date date = new Date();
+        Vector v = new Vector(date,"");
         File path = context.getFilesDir();
-        File file = new File(path, "contact_list_application.txt");
+        File file = new File(path, v.getTimeSlot()+"contact_list_application.txt");
         //file.delete();
         //si le fichier est vide on le complete avec la liste de contact
         if(file.length() == 0){
@@ -54,39 +58,61 @@ public class DB {
 
     }
 
-    public static void synchronise_contact_list_application(JSONArray json, Context context){
+    public static void synchronise_contact_list_application(JSONObject json, Context context) {
+        Date date = new Date();
+        Vector v = new Vector(date,"");
+        String[] slots = {"810", "1012", "1214", "1416", "1618", "1820", "2022", "2200", "6", "608"};
+        for ( String s : slots){
+            writeAllFiles(s, json, context);
+        }
+        loadCurrentTimeSlot(v.getTimeSlot(),context);
+    }
+    private static void loadCurrentTimeSlot(String slotTime, Context context){
         File path = context.getFilesDir();
-        File file = new File(path, "contact_list_application.txt");
+        File file = new File(path, slotTime+"contact_list_application.txt");
+        String[] general = new String(readFile(file)).split("\n");
         contact_list_application = new ArrayList<>();
+        for(int i=0; i<general.length; i++){
+            String[] col = general[i].split(",");
+            if(col.length>=3)
+                contact_list_application.add(new Contact(col[0], col[1], col[2]));
+        }
+        sortFileByPercentage();
+
+    }
+
+    private static void writeAllFiles(String timeSlot, JSONObject json, Context context) {
+        File path = context.getFilesDir();
+        String fileName = timeSlot+"contact_list_application.txt";
+        File file = new File(path, fileName);
+        //contact_list_application = new ArrayList<>();
         boolean erase = true;
-        for(int i=0; i<json.length(); i++){
-            try {
-                JSONObject jsonObject = json.getJSONObject(i);
+        try {
+            JSONArray myArray = json.getJSONArray(timeSlot);
+              for (int i = 0; i < json.getJSONArray(timeSlot).length(); i++){
+                JSONObject jsonObject = myArray.getJSONObject(i);
                 double score = Double.parseDouble(jsonObject.getString("score"));
-                score = score*100;
+                score = score * 100;
                 String result = String.format("%.0f", score);
                 String name = jsonObject.getString("name");
-                String numero= "";
-                for( Contact c : contact_list_mobile){
+                String numero = "";
+                for (Contact c : contact_list_mobile) {
                     String nameMobile = c.name;
                     //nameMobile = nameMobile.replace('é','e');
-                    if(nameMobile.equals(name)){
+                    if (nameMobile.equals(name)) {
                         numero = c.numero;
                     }
                 }
-                Contact c = new Contact(jsonObject.getString("name"),numero,result+"%");
-                contact_list_application.add(c);
+                Contact c = new Contact(jsonObject.getString("name"), numero, result + "%");
+                //contact_list_application.add(c);
 
-                String ligne = c.name+","+c.numero+","+c.percentage+"\n";
+                String ligne = c.name + "," + c.numero + "," + c.percentage + "\n";
                 writeToFile(file, ligne, erase);
                 erase = false;
-
+            }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-        }
-        sortFileByPercentage();
     }
 
     private static void sortFileByPercentage() {
@@ -141,7 +167,7 @@ public class DB {
             }
         }
         else {
-            bytes = new byte[length];
+            bytes = new byte[sizeToWrite];
             for(int i=0; i<sizeToWrite; i++){
                 bytes[i] = toWrite[i];
             }
