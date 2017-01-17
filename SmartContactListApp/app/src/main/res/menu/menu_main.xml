@@ -17,9 +17,9 @@
         android:orderInCategory="100"
         android:title="Synchronisation"
         app:showAsAction="never" />
-    <item
+    <!--<item
         android:id="@+id/actualiser"
         android:orderInCategory="100"
         android:title="Actualiser"
-        app:showAsAction="never" />
+        app:showAsAction="never" />-->
 </menu>

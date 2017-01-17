@@ -48,6 +48,10 @@ public class PrintContactListActivity  extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
+        initialisation();
+    }
+
+    private void initialisation() {
         RecyclerView recyclerView = (RecyclerView)findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
 
@@ -63,7 +67,11 @@ public class PrintContactListActivity  extends AppCompatActivity {
         new ManageLocalFile(this);
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initialisation();
+    }
 
     private List<Contact> getListItemData(){
         RetreiveContactList retreiveContactList= new RetreiveContactList();
@@ -101,13 +109,13 @@ public class PrintContactListActivity  extends AppCompatActivity {
             startActivity(intente);
             return true;
         }
-        if (id == R.id.actualiser) {
+        //if (id == R.id.actualiser) {
 
-            Intent intente = getIntent();
-            finish();
-            startActivity(intente);
-            return true;
-        }
+          //  Intent intente = getIntent();
+            //finish();
+            //startActivity(intente);
+            //return true;
+        //}
 
         return super.onOptionsItemSelected(item);
     }
