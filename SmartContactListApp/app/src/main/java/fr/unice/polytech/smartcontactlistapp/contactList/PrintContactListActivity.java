@@ -101,6 +101,13 @@ public class PrintContactListActivity  extends AppCompatActivity {
             startActivity(intente);
             return true;
         }
+        if (id == R.id.actualiser) {
+
+            Intent intente = getIntent();
+            finish();
+            startActivity(intente);
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
