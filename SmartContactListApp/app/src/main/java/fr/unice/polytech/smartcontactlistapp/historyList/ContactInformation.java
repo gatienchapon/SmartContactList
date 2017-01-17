@@ -7,7 +7,7 @@ import java.util.Date;
  */
 
 public class ContactInformation {
-    private Date callDate;
+    private String callDate;
     private float callDuration;
     private String callNumber;
     private String callName;
@@ -15,7 +15,7 @@ public class ContactInformation {
     private int nbTotalCall=1;
 
 
-    public ContactInformation(Date callDate, float callDuration, String callNumber, String callName, String callType) {
+    public ContactInformation(String callDate, float callDuration, String callNumber, String callName, String callType) {
         this.callDate = callDate;
         this.callDuration = callDuration;
         this.callNumber = callNumber;
@@ -23,7 +23,7 @@ public class ContactInformation {
         this.callType = callType;
     }
 
-    public Date getCallDate() {
+    public String getCallDate() {
         return callDate;
     }
 

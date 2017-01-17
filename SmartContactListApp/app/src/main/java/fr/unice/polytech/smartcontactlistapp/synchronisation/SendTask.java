@@ -86,7 +86,7 @@ public class SendTask extends AsyncTask<Void, Void, Boolean> {
         return true;
     }
 
-    private String removeAccent(String source) {
+    public static String removeAccent(String source) {
         return Normalizer.normalize(source, Normalizer.Form.NFD).replaceAll("[\u0300-\u036F]", "");
     }
     private JSONObject createJson(String[] s) {

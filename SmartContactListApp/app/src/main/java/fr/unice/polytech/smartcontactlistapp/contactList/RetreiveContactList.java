@@ -10,6 +10,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import static fr.unice.polytech.smartcontactlistapp.synchronisation.SendTask.removeAccent;
+
 /**
  * Created by chapon on 04/11/16.
  */
@@ -41,6 +43,7 @@ public class RetreiveContactList {
                 while (pCur.moveToNext()) {
                     String phoneNo = pCur.getString(pCur.getColumnIndex(
                             ContactsContract.CommonDataKinds.Phone.NUMBER));
+                    name = removeAccent(name);
                     listContact.add(new Contact(name,phoneNo, "100%"));
 
                 }

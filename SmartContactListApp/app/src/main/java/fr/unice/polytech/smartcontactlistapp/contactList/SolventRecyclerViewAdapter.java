@@ -31,9 +31,13 @@ public class SolventRecyclerViewAdapter  extends RecyclerView.Adapter<SolventVie
 
     @Override
     public void onBindViewHolder(SolventViewHolders holder, int position) {
-        holder.contactName.setText(itemList.get(position).name);
-        holder.number.setText(itemList.get(position).numero);
-        holder.percentage.setText(itemList.get(position).percentage);
+        Contact contact = itemList.get(position);
+        if (contact != null){
+            holder.contactName.setText(contact.name);
+            holder.number.setText(contact.numero);
+            holder.percentage.setText(contact.percentage);
+        }
+
     }
 
     @Override
