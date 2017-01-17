@@ -106,7 +106,8 @@ class randomForest:
             i =0
             resultatFinal[str(currentSlotTime)] = []
             for proba in Y_pred[0]:
-                resultatFinal[str(currentSlotTime)].append({"name":names[i],"score":proba})
+                if(proba != 0):
+                    resultatFinal[str(currentSlotTime)].append({"name":names[i],"score":proba})
                 i=i+1
         df = pd.DataFrame(data = test)
         df.to_csv(path+'/testFile.txt',index=False)
