@@ -30,12 +30,21 @@ def get_tasks():
     path = 'dataset/'+ip +'_folder'
     distutils.dir_util.mkpath(path)
     content = request.json
-    content = content['request']
-    df = pd.DataFrame(data = content)
+    history = content['history']
+    if history[0]['Year'] != 'empty':
+        df = pd.DataFrame(data = history)
+        df.to_csv(path+'/test.txt',index=False)
+        Classifier.classify(path)
+    else:
+        print("Erreur Json");
+        #Classifier.classify("dataset/192.168.0.37_folder")
+    requestContent = content['request']
+    df = pd.DataFrame(data = requestContent)
     df.to_csv(path+'/testFile.txt',index=False)
     return jsonify(Classifier.predicte(path))
 
 if __name__ == '__main__':
+    #Classifier.classify("dataset/192.168.0.37_folder")
     if 2 in ni.ifaddresses('wlan0'):
         print "wlan0 IP : %s" % ni.ifaddresses('wlan0')[2][0]['addr']
     if 2 in ni.ifaddresses('eth0'):
