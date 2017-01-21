@@ -2,8 +2,10 @@ package fr.unice.polytech.smartcontactlistapp.synchronisation;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
@@ -41,23 +43,30 @@ import fr.unice.polytech.smartcontactlistapp.historyList.ContactHistory;
 public class SynchronisationActivity extends AppCompatActivity {
 
     private ProgressBar barSend;
-    private ProgressBar barSynchronisation;
+    //private ProgressBar barSynchronisation;
     private EditText ServerAdress;
+    private TextView successOrNot;
+    private TextView lastUpdate;
     public static String ipAdress="192.168.1.145";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.synchronisation_activity);
-        final Button synchronisation = (Button)findViewById(R.id.synchronisation);
-        Button send = (Button)findViewById(R.id.send_button);
+        final Button synchronisation = (Button)findViewById(R.id.sync);
+        successOrNot = (TextView) findViewById(R.id.successOrNot);
+        SharedPreferences mShared = PreferenceManager.getDefaultSharedPreferences(this);
+        lastUpdate = (TextView) findViewById(R.id.lastSync);
+        lastUpdate.setText("Last Sync : "+mShared.getString("last_update","unknown"));
+        successOrNot.setVisibility(View.INVISIBLE);
+        //Button send = (Button)findViewById(R.id.send_button);
         barSend = (ProgressBar)findViewById(R.id.progressSend);
-        barSynchronisation = (ProgressBar)findViewById(R.id.progressSynchronised);
+        //barSynchronisation = (ProgressBar)findViewById(R.id.progressSynchronised);
         barSend.setVisibility(View.INVISIBLE);
-        barSynchronisation.setVisibility(View.INVISIBLE);
+        //barSynchronisation.setVisibility(View.INVISIBLE);
         ServerAdress = (EditText) findViewById(R.id.editAdress);
 
-        send.setOnClickListener(new View.OnClickListener() {
+        /*send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (! TextUtils.isEmpty(ServerAdress.getText().toString())){
@@ -65,7 +74,7 @@ public class SynchronisationActivity extends AppCompatActivity {
                 }
                 contactServer();
             }
-        });
+        });*/
         synchronisation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,7 +88,7 @@ public class SynchronisationActivity extends AppCompatActivity {
 
     private void synchronisation() {
         SynchronisationTask s;
-        s = new SynchronisationTask(this, barSynchronisation);
+        s = new SynchronisationTask(this, barSend, successOrNot,lastUpdate);
         s.execute((Void)null);
     }
 
@@ -115,11 +124,11 @@ public class SynchronisationActivity extends AppCompatActivity {
             startActivity(intente);
             return true;
         }
-        if (id == R.id.journal_appel) {
+        /*if (id == R.id.journal_appel) {
             Intent intente = new Intent(SynchronisationActivity.this, ContactActivity.class);
             startActivity(intente);
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }

@@ -30,20 +30,28 @@ public class SolventViewHolders extends RecyclerView.ViewHolder implements View.
         contactName = (TextView) itemView.findViewById(R.id.contact);
         number = (TextView) itemView.findViewById(R.id.numero);
         contactPhoto =(ImageView) itemView.findViewById(R.id.contactPhoto);
+        contactPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                call();
+            }
+        });
         percentage = (TextView) itemView.findViewById(R.id.percentage);
         this.context = context;
+    }
+
+    private void call() {
+        String numero = contact_list_application.get(getPosition()).numero;
+        Intent i = new Intent(Intent.ACTION_DIAL);
+        String p = "tel:" + numero;
+        i.setData(Uri.parse(p));
+        context.startActivity(i);
     }
 
     @Override
     public void onClick(View view) {
 
-        Toast.makeText(view.getContext(), "Clicked Position = " + getPosition(), Toast.LENGTH_SHORT).show();
-        String numero = contact_list_application.get(getPosition()).numero;
 
-        Intent i = new Intent(Intent.ACTION_DIAL);
-        String p = "tel:" + numero;
-        i.setData(Uri.parse(p));
-        context.startActivity(i);
     }
 
 }

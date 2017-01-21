@@ -54,11 +54,11 @@ public class ContactActivity extends AppCompatActivity {
 
             return true;
         }
-        if (id == R.id.journal_appel) {
+        /*if (id == R.id.journal_appel) {
             Intent intente = new Intent(ContactActivity.this, ContactActivity.class);
             startActivity(intente);
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }

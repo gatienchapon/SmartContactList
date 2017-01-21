@@ -30,32 +30,37 @@ public class DB {
     public static List<Contact> contact_list_mobile;
 
 
-    public static void init_contact_list_application(Context context){
+    public static boolean init_contact_list_application(Context context){
         Date date = new Date();
         Vector v = new Vector(date,"");
+        return loadFile(v.getTimeSlot(), context);
+
+    }
+
+    public static boolean loadFile(String timeSlot, Context context) {
         File path = context.getFilesDir();
-        File file = new File(path, v.getTimeSlot()+"contact_list_application.txt");
+        File file = new File(path, timeSlot+"contact_list_application.txt");
         //file.delete();
         //si le fichier est vide on le complete avec la liste de contact
         if(file.length() == 0){
-            for(int i=0; i<contact_list_mobile.size(); i++){
+            /*for(int i=0; i<contact_list_mobile.size(); i++){
                 Contact c = contact_list_mobile.get(i);
                 String ligne = c.name+","+c.numero+","+c.percentage+"\n";
                 writeToFile(file, ligne, false);
-            }
-            contact_list_application = contact_list_mobile;
+            }*/
+            return false;
         }else{
             //On lit le fichier
             String[] general = new String(readFile(file)).split("\n");
             contact_list_application = new ArrayList<>();
             for(int i=0; i<general.length; i++){
-                    String[] col = general[i].split(",");
-                    if(col.length>=3)
-                        contact_list_application.add(new Contact(col[0], col[1], col[2]));
+                String[] col = general[i].split(",");
+                if(col.length>=3)
+                    contact_list_application.add(new Contact(col[0], col[1], col[2]));
             }
             sortFileByPercentage();
+            return true;
         }
-
     }
 
     public static void synchronise_contact_list_application(JSONObject json, Context context) {

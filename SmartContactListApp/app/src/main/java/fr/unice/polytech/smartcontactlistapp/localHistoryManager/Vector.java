@@ -10,13 +10,17 @@ import java.util.Date;
 public class Vector {
     public static String[] classes = {"Year","Month","DayNumber","DayWeek","Hour","Minute","Seconde","SlotTime","Class"};
 
-    private String year;
-    private String month;
-    private String numberDay;
+    public String year;
+    public String month;
+    public String numberDay;
     private String weekDay;
-    private String hour;
-    private String minute;
+    public String hour;
+    public String minute;
     private String seconde;
+
+    public Vector(String slotTime) {
+        timeSlot =slotTime;
+    }
 
     public String getTimeSlot() {
         return timeSlot;
@@ -39,7 +43,20 @@ public class Vector {
         fillTimeSlot(calendar.get(Calendar.HOUR_OF_DAY));
         this.contactName = contactName;
     }
-
+    public String[] getBeginEndSlotTime(){
+        String[] result = new String[2];
+        if(timeSlot.length() == 4){
+            result[0] = timeSlot.charAt(0)+""+timeSlot.charAt(1);
+            result[1] = timeSlot.charAt(2)+""+timeSlot.charAt(3);
+        }else if(timeSlot.length() == 3){
+            result[0] = "0"+timeSlot.charAt(0)+"";
+            result[1] = timeSlot.charAt(1)+""+timeSlot.charAt(2);
+        }else{
+            result[0] = "00";
+            result[1] = timeSlot.charAt(0)+"";
+        }
+        return result;
+    }
     public void fillTimeSlot(int hour){
         String[] slots = {"810","1012","1214","1416","1618","1820","2022","2200","6","608"};
         if(hour >= 8 && hour <10){

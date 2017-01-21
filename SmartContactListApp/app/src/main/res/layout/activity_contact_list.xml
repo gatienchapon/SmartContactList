@@ -5,10 +5,35 @@
     android:layout_height="match_parent"
     android:padding="8dp">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="List validity period : 8:00 to 10:00"
+        android:drawablePadding="8dp"
+        android:paddingRight="8dp"
+        android:gravity="center"
+        android:drawableLeft="@android:drawable/ic_menu_today"
+        android:textColor="@color/white"
+        android:background="@color/cardview_dark_background"
+        android:layout_marginTop="5dp"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/currentSlotTime"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/make_Sync"
+        android:text="Make a Sync"
+        android:gravity="center"
+        android:drawableLeft="@android:drawable/ic_popup_sync"/>
     <android.support.v7.widget.RecyclerView
+        android:layout_marginTop="5dp"
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical" />
+        android:scrollbars="vertical"
+        android:layout_below="@+id/currentSlotTime"/>
 
 </RelativeLayout>

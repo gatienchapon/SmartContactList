@@ -4,17 +4,64 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Entrer votre adresse ip :"
+        android:layout_gravity="center_horizontal"
+        android:text="Last Sync : "
+        android:paddingRight="8dp"
+        android:drawablePadding="8dp"
+        android:gravity="center"
+        android:drawableLeft="@android:drawable/ic_popup_sync"
+        android:textColor="@color/white"
+        android:background="@color/cardview_dark_background"
+        android:layout_marginTop="10dp"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/lastSync"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="20dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Enter the server IP adress:"
         android:layout_margin="15dp"
         android:id="@+id/ipText"/>
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/ipText"
+        android:text="192.168."
         android:hint="adresse serveur"
         android:id="@+id/editAdress"/>
 
     <Button
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginLeft="10dp"
+        android:background="@drawable/circle"
+        android:drawableTop="@android:drawable/ic_popup_sync"
+        android:paddingTop="20dp"
+        android:text="Sync"
+        android:id="@+id/sync"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:textColor="#fff" />
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progressSend"
+        android:layout_below="@+id/sync"
+        android:layout_centerHorizontal="true"
+        android:paddingTop="10dp"
+        android:layout_centerVertical="true"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sync Success !"
+        android:layout_margin="15dp"
+        android:textColor="@color/red"
+        android:layout_below="@id/sync"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/successOrNot"/>
+
+    <!--<Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Send"
@@ -41,5 +88,5 @@
         android:layout_height="wrap_content"
         android:id="@+id/progressSynchronised"
         android:layout_toRightOf="@id/synchronisation"
-        android:layout_alignBottom="@id/synchronisation"/>
+        android:layout_alignBottom="@id/synchronisation"/>-->
 </RelativeLayout>
