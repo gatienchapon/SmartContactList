@@ -2,6 +2,8 @@ package fr.unice.polytech.smartcontactlistapp.synchronisation;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.DhcpInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -22,11 +24,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.text.Normalizer;
 import java.util.Date;
+import java.util.Enumeration;
 
 import fr.unice.polytech.smartcontactlistapp.localHistoryManager.Vector;
 
@@ -57,6 +66,8 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(Void... params) {
+        //Obtention de l'ip du serveur local
+       // sendUDPRequest();
         //Lecture du fichier
         File path = context.getFilesDir();
         File file = new File(path, "historyCall.txt");
@@ -91,15 +102,16 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
         URL url = null;
         try {
             Log.d("DEBUG", "ipadress dans task :"+SynchronisationActivity.ipAdress+" ");
-            url = new URL("http://"+SynchronisationActivity.ipAdress+":5000/predict/");
+            // url = new URL("http://"+SynchronisationActivity.ipAdress+":5000/predict/");
+            url = new URL("http://gatienchapon.pythonanywhere.com/predict/");
             Log.d("HOST","http://"+SynchronisationActivity.ipAdress+":5000/predict/");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json");
             connection.setRequestMethod("POST");
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(10000);
-            connection.setReadTimeout(10000);
+            connection.setConnectTimeout(30000);
+            connection.setReadTimeout(30000);
             connection.setDoOutput(true);
             connection.setDoInput(true);
             connection.connect();
@@ -136,6 +148,23 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
             return false;
         }
         return true;
+    }
+
+
+
+    private void sendUDPRequest() {
+
+        /*Discover d = new Discover(context,6000);
+        try {
+            DatagramPacket receivePacket = d.sendBroadcast("coucou");
+            String ip = receivePacket.getAddress().toString();
+            String sentence = new String(receivePacket.getData());
+            Log.d("AdresseIP", ip + "  "+sentence );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
+
     }
 
     /*
