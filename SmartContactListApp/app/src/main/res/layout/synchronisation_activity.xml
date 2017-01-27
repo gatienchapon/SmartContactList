@@ -61,6 +61,15 @@
         android:layout_below="@id/sync"
         android:layout_centerHorizontal="true"
         android:id="@+id/successOrNot"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Loading ..."
+        android:layout_margin="15dp"
+        android:textColor="@color/red"
+        android:layout_below="@id/progressSend"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/loading"/>
 
     <!--<Button
         android:layout_width="wrap_content"

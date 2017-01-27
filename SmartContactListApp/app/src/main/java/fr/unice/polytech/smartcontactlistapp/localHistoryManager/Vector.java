@@ -9,7 +9,7 @@ import java.util.Date;
 
 public class Vector {
     public static String[] classes = {"Year","Month","DayNumber","DayWeek","Hour","Minute","Seconde","SlotTime","Class"};
-
+    public static String[] classes2 = {"Class","DayNumber","DayWeek","Hour","Minute","Month","Seconde","SlotTime","Year"};
     public String year;
     public String month;
     public String numberDay;

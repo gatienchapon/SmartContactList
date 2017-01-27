@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import fr.unice.polytech.smartcontactlistapp.contactList.Contact;
 import fr.unice.polytech.smartcontactlistapp.localHistoryManager.Vector;
@@ -63,12 +64,12 @@ public class DB {
         }
     }
 
-    public static void synchronise_contact_list_application(JSONObject json, Context context) {
+    public static void synchronise_contact_list_application(JSONObject json, Context context, Map<String, String> coorspondanceIDContact) {
         Date date = new Date();
         Vector v = new Vector(date,"");
         String[] slots = {"810", "1012", "1214", "1416", "1618", "1820", "2022", "2200", "6", "608"};
         for ( String s : slots){
-            writeAllFiles(s, json, context);
+            writeAllFiles(s, json, context, coorspondanceIDContact);
         }
         loadCurrentTimeSlot(v.getTimeSlot(),context);
     }
@@ -86,7 +87,7 @@ public class DB {
 
     }
 
-    private static void writeAllFiles(String timeSlot, JSONObject json, Context context) {
+    private static void writeAllFiles(String timeSlot, JSONObject json, Context context, Map<String, String> coorspondanceIDContact) {
         File path = context.getFilesDir();
         String fileName = timeSlot+"contact_list_application.txt";
         File file = new File(path, fileName);
@@ -99,21 +100,20 @@ public class DB {
                 double score = Double.parseDouble(jsonObject.getString("score"));
                 score = score * 100;
                 String result = String.format("%.0f", score);
-                String name = jsonObject.getString("name");
+                String id = jsonObject.getString("name");
+                  String name = coorspondanceIDContact.get(id);
                 String numero = "";
                 for (Contact c : contact_list_mobile) {
                     String nameMobile = c.name;
-                    //nameMobile = nameMobile.replace('é','e');
                     if (nameMobile.equals(name)) {
                         numero = c.numero;
+                        Contact contact = new Contact(name, numero, result + "%");
+                        String ligne = contact.name + "," + contact.numero + "," + contact.percentage + "\n";
+                        writeToFile(file, ligne, erase);
+                        erase = false;
                     }
                 }
-                Contact c = new Contact(jsonObject.getString("name"), numero, result + "%");
-                //contact_list_application.add(c);
 
-                String ligne = c.name + "," + c.numero + "," + c.percentage + "\n";
-                writeToFile(file, ligne, erase);
-                erase = false;
             }
             } catch (JSONException e) {
                 e.printStackTrace();

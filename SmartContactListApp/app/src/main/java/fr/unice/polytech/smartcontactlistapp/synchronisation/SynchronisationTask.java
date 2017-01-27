@@ -2,10 +2,9 @@ package fr.unice.polytech.smartcontactlistapp.synchronisation;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.DhcpInfo;
-import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -16,30 +15,24 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.HttpURLConnection;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.NetworkInterface;
-import java.net.SocketException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.text.Normalizer;
 import java.util.Date;
-import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import fr.unice.polytech.smartcontactlistapp.localHistoryManager.Vector;
 
 import static fr.unice.polytech.smartcontactlistapp.DB.DB.synchronise_contact_list_application;
+import static fr.unice.polytech.smartcontactlistapp.contactList.PrintContactListActivity.reload;
 
 /**
  * Created by chapon on 09/12/16.
@@ -50,17 +43,23 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
     ProgressBar bar;
     TextView successOrNot;
     TextView lastUpdate;
-    SynchronisationTask(Context context, ProgressBar bar, TextView successOrNot, TextView lastUpdate) {
+    TextView loading;
+    private Map<String,String> coorspondanceIDContact;
+    RecyclerView recyclerView;
+    SynchronisationTask(Context context, ProgressBar bar, TextView successOrNot, TextView lastUpdate, TextView loading, RecyclerView recyclerView) {
         this.context = context;
         this.bar = bar;
         this.successOrNot = successOrNot;
         this.lastUpdate = lastUpdate;
-
+        coorspondanceIDContact = new HashMap<>();
+        this.loading = loading;
+        this.recyclerView = recyclerView;
     }
 
     @Override
     protected void onPreExecute() {
         bar.setVisibility(View.VISIBLE);
+        loading.setVisibility(View.VISIBLE);
         successOrNot.setVisibility(View.INVISIBLE);
     }
 
@@ -78,6 +77,7 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
         try {
             in = new FileInputStream(file);
             in.read(bytes);
+            Log.d("File read", new String(bytes));
             in.close();
         } catch (FileNotFoundException e) {
             found = false;
@@ -87,13 +87,37 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
         }
         JSONArray jsonHistory = null;
         if(!found){
-            try {
-
-                String rep ="[{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"15\",\"Minute\":\"38\",\"Seconde\":\"46\",\"SlotTime\":\"1416\",\"Class\":\"Martine Robin\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"14\",\"Minute\":\"31\",\"Seconde\":\"5\",\"SlotTime\":\"1416\",\"Class\":\"Xavier Grondinos\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"14\",\"Minute\":\"30\",\"Seconde\":\"44\",\"SlotTime\":\"1416\",\"Class\":\"Xavier Grondin\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"12\",\"Minute\":\"10\",\"Seconde\":\"15\",\"SlotTime\":\"1214\",\"Class\":\"Olivier Martinez\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"11\",\"Minute\":\"16\",\"Seconde\":\"11\",\"SlotTime\":\"1012\",\"Class\":\"Olivier Martinez\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"11\",\"Minute\":\"13\",\"Seconde\":\"31\",\"SlotTime\":\"1012\",\"Class\":\"Pico Florent\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"11\",\"Minute\":\"11\",\"Seconde\":\"46\",\"SlotTime\":\"1012\",\"Class\":\"Severine Filipini\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"10\",\"Minute\":\"59\",\"Seconde\":\"23\",\"SlotTime\":\"1012\",\"Class\":\"Marie-Therese German\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"10\",\"Minute\":\"46\",\"Seconde\":\"14\",\"SlotTime\":\"1012\",\"Class\":\"Macciotta Yann\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"10\",\"Minute\":\"41\",\"Seconde\":\"4\",\"SlotTime\":\"1012\",\"Class\":\"Greg Piscitello\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"10\",\"Minute\":\"40\",\"Seconde\":\"41\",\"SlotTime\":\"1012\",\"Class\":\"Stephane Devos\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"10\",\"Minute\":\"38\",\"Seconde\":\"46\",\"SlotTime\":\"1012\",\"Class\":\"Repondeur\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"10\",\"Minute\":\"38\",\"Seconde\":\"30\",\"SlotTime\":\"1012\",\"Class\":\"Kais Shido\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"10\",\"Minute\":\"36\",\"Seconde\":\"2\",\"SlotTime\":\"1012\",\"Class\":\"Emmanuelle Abad\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"9\",\"Minute\":\"51\",\"Seconde\":\"43\",\"SlotTime\":\"810\",\"Class\":\"Emmanuelle Abad\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"8\",\"Minute\":\"33\",\"Seconde\":\"29\",\"SlotTime\":\"810\",\"Class\":\"Gilbert Robin\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"8\",\"Minute\":\"31\",\"Seconde\":\"36\",\"SlotTime\":\"810\",\"Class\":\"Martine Robin\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"8\",\"Minute\":\"28\",\"Seconde\":\"46\",\"SlotTime\":\"810\",\"Class\":\"Mon Amour\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"8\",\"Minute\":\"27\",\"Seconde\":\"58\",\"SlotTime\":\"810\",\"Class\":\"Mon Amour\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"7\",\"DayWeek\":\"7\",\"Hour\":\"7\",\"Minute\":\"23\",\"Seconde\":\"43\",\"SlotTime\":\"608\",\"Class\":\"Isp Codis\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"6\",\"DayWeek\":\"6\",\"Hour\":\"22\",\"Minute\":\"26\",\"Seconde\":\"39\",\"SlotTime\":\"2200\",\"Class\":\"Isp Codis\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"6\",\"DayWeek\":\"6\",\"Hour\":\"20\",\"Minute\":\"47\",\"Seconde\":\"24\",\"SlotTime\":\"2022\",\"Class\":\"Mon Amour\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"6\",\"DayWeek\":\"6\",\"Hour\":\"19\",\"Minute\":\"39\",\"Seconde\":\"14\",\"SlotTime\":\"1820\",\"Class\":\"Xavier Grondin\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"6\",\"DayWeek\":\"6\",\"Hour\":\"19\",\"Minute\":\"38\",\"Seconde\":\"57\",\"SlotTime\":\"1820\",\"Class\":\"Xavier Grondinos\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"6\",\"DayWeek\":\"6\",\"Hour\":\"19\",\"Minute\":\"16\",\"Seconde\":\"34\",\"SlotTime\":\"1820\",\"Class\":\"Mon Amour\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"6\",\"DayWeek\":\"6\",\"Hour\":\"17\",\"Minute\":\"26\",\"Seconde\":\"31\",\"SlotTime\":\"1618\",\"Class\":\"Mon Amour\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"6\",\"DayWeek\":\"6\",\"Hour\":\"17\",\"Minute\":\"11\",\"Seconde\":\"31\",\"SlotTime\":\"1618\",\"Class\":\"Mon Amour\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"6\",\"DayWeek\":\"6\",\"Hour\":\"16\",\"Minute\":\"54\",\"Seconde\":\"8\",\"SlotTime\":\"1618\",\"Class\":\"Mathieu P\"},{\"Year\":\"2017\",\"Month\":\"1\",\"DayNumber\":\"6\",\"DayWeek\":\"6\",\"Hour\":\"15\",\"Minute\":\"51\",\"Seconde\":\"8\",\"SlotTime\":\"1416\",\"Class\":\"Mon Amour\"}]";
-                jsonHistory = new JSONArray(rep);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            String history = "Maman,7,7,15,38,1,46,1416,2017\n" +
+                    "Jean Dupuis,7,7,14,31,1,5,1416,2017\n" +
+                    "Stéphane Lebon,7,7,14,30,1,44,1416,2017\n" +
+                    "Gaëtan Bertot,7,7,12,10,1,15,1214,2017\n" +
+                    "Gaëtan Bertot,7,7,11,16,1,11,1012,2017\n" +
+                    "Hélène Guillot,7,7,11,13,1,31,1012,2017\n" +
+                    "Michelle Jaccob,7,7,11,11,1,46,1012,2017\n" +
+                    "Hubert de la Croix,7,7,10,59,1,23,1012,2017\n" +
+                    "Pierre Perrin,7,7,10,46,1,14,1012,2017\n" +
+                    "Pépé,7,7,10,41,1,4,1012,2017\n" +
+                    "Mémé,7,7,10,40,1,41,1012,2017\n" +
+                    "Repondeur,7,7,10,38,1,46,1012,2017\n" +
+                    "Yann Goubert,7,7,10,38,1,30,1012,2017\n" +
+                    "Laura Labruit,7,7,10,36,1,2,1012,2017\n" +
+                    "Laura Labruit,7,7,9,51,1,43,810,2017\n" +
+                    "Papa,7,7,8,33,1,29,810,2017\n" +
+                    "Maman,7,7,8,31,1,36,810,2017\n" +
+                    "Mon Amour,7,7,8,28,1,46,810,2017\n" +
+                    "Mon Amour,7,7,8,27,1,58,810,2017\n" +
+                    "Léa Ravelle,7,7,7,23,1,43,608,2017\n" +
+                    "Léa Ravelle,6,6,22,26,1,39,2200,2017\n" +
+                    "Mon Amour,6,6,20,47,1,24,2022,2017\n" +
+                    "Stéphane Lebon,6,6,19,39,1,14,1820,2017\n" +
+                    "Jean Dupuis,6,6,19,38,1,57,1820,2017\n" +
+                    "Mon Amour,6,6,19,16,1,34,1820,2017\n" +
+                    "Mon Amour,6,6,17,26,1,31,1618,2017\n" +
+                    "Mon Amour,6,6,17,11,1,31,1618,2017\n" +
+                    "Léo Laccroit,6,6,16,54,1,8,1618,2017\n" +
+                    "Mon Amour,6,6,15,51,1,8,1416,2017";
+            String table[] = new String(history.getBytes()).split("\n");
+            jsonHistory = createJson2(table);
         }else{
             String[] s= new String(bytes).split("\n");
             jsonHistory = createJson(s);
@@ -104,20 +128,22 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
             Log.d("DEBUG", "ipadress dans task :"+SynchronisationActivity.ipAdress+" ");
             // url = new URL("http://"+SynchronisationActivity.ipAdress+":5000/predict/");
             url = new URL("http://gatienchapon.pythonanywhere.com/predict/");
-            Log.d("HOST","http://"+SynchronisationActivity.ipAdress+":5000/predict/");
+            //Log.d("HOST","http://"+SynchronisationActivity.ipAdress+":5000/predict/");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             connection.setRequestProperty("Content-Type", "application/json");
             connection.setRequestProperty("Accept", "application/json");
             connection.setRequestMethod("POST");
             connection.setRequestMethod("GET");
-            connection.setConnectTimeout(30000);
-            connection.setReadTimeout(30000);
+            connection.setConnectTimeout(60000);
+            connection.setReadTimeout(60000);
             connection.setDoOutput(true);
             connection.setDoInput(true);
             connection.connect();
             DataOutputStream contentSend = new DataOutputStream(connection.getOutputStream());
             Vector v = new Vector(new Date(), "coucou");
             JSONObject json  = fillJsonArray(v).put("history", jsonHistory);
+            Log.d("To send ", json.toString());
+
             contentSend.writeBytes(json.toString());
 
             int statusCode = connection.getResponseCode();
@@ -129,7 +155,7 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
                     responseStrBuilder.append(inputStr);
                 JSONObject j = new JSONObject(responseStrBuilder.toString());
                 Log.d("JSON", j.toString());
-                synchronise_contact_list_application(j, context);
+                synchronise_contact_list_application(j, context, coorspondanceIDContact);
                 content.close();
             }else{
                 contentSend.close();
@@ -152,20 +178,6 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
 
 
 
-    private void sendUDPRequest() {
-
-        /*Discover d = new Discover(context,6000);
-        try {
-            DatagramPacket receivePacket = d.sendBroadcast("coucou");
-            String ip = receivePacket.getAddress().toString();
-            String sentence = new String(receivePacket.getData());
-            Log.d("AdresseIP", ip + "  "+sentence );
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }*/
-
-    }
 
     /*
     On remplit un vecteur contenant la date du jour
@@ -193,7 +205,37 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
     public static String removeAccent(String source) {
         return Normalizer.normalize(source, Normalizer.Form.NFD).replaceAll("[\u0300-\u036F]", "");
     }
+    private JSONArray createJson2(String[] s) {
+        Map<String, String> nameToId = new HashMap<>();
+        JSONArray jsonArray = new JSONArray();
+        for(int i=0; i<s.length; i++){
+            JSONObject j = new JSONObject();
+            try {
+                String[] col = s[i].split(",");
+                String[] classe = Vector.classes2;
+                for(int iter =0; iter<col.length; iter++){
+                    if (iter == 0) {
+                        String c = col[iter];
+                        String id = "C"+i;
+                        if(!nameToId.containsKey(c))
+                        {
+                            coorspondanceIDContact.put(id, c);
+                            nameToId.put(c,id);
+                        }
+                        j.put(classe[iter], nameToId.get(c));
+                    }
+                    else
+                        j.put(classe[iter],col[iter]);
+                }
+                jsonArray.put(j);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        return jsonArray;
+    }
     private JSONArray createJson(String[] s) {
+        Map<String, String> nameToId = new HashMap<>();
         JSONArray jsonArray = new JSONArray();
         for(int i=0; i<s.length; i++){
             JSONObject j = new JSONObject();
@@ -203,9 +245,13 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
                 for(int iter =0; iter<col.length; iter++){
                     if (iter == col.length-1) {
                         String c = col[iter];
-                        c = removeAccent(c);
-                        //c = c.replace('ë','e');
-                        j.put(classe[iter], c);
+                        String id = "C"+i;
+                        if(!nameToId.containsKey(c))
+                        {
+                            coorspondanceIDContact.put(id, c);
+                            nameToId.put(c,id);
+                        }
+                        j.put(classe[iter], nameToId.get(c));
                     }
                     else
                         j.put(classe[iter],col[iter]);
@@ -244,6 +290,8 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
         }
         successOrNot.setVisibility(View.VISIBLE);
         bar.setVisibility(View.INVISIBLE);
+        loading.setVisibility(View.INVISIBLE);
+        reload(recyclerView,context);
     }
 
 }

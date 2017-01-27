@@ -4,9 +4,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.ContactsContract;
-import android.util.Log;
-import android.widget.Toast;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +40,6 @@ public class RetreiveContactList {
                 while (pCur.moveToNext()) {
                     String phoneNo = pCur.getString(pCur.getColumnIndex(
                             ContactsContract.CommonDataKinds.Phone.NUMBER));
-                    name = removeAccent(name);
                     listContact.add(new Contact(name,phoneNo, "100%"));
 
                 }

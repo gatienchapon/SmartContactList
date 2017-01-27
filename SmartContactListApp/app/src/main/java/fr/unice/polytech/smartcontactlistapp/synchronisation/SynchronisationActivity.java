@@ -1,12 +1,15 @@
 package fr.unice.polytech.smartcontactlistapp.synchronisation;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -40,14 +43,22 @@ import fr.unice.polytech.smartcontactlistapp.historyList.ContactActivity;
 import fr.unice.polytech.smartcontactlistapp.historyList.ContactAdapter;
 import fr.unice.polytech.smartcontactlistapp.historyList.ContactHistory;
 
-public class SynchronisationActivity extends AppCompatActivity {
+public class SynchronisationActivity extends Dialog {
 
     private ProgressBar barSend;
     //private ProgressBar barSynchronisation;
     private EditText ServerAdress;
     private TextView successOrNot;
     private TextView lastUpdate;
+    private TextView loading;
     public static String ipAdress="192.168.1.145";
+    private RecyclerView recyclerView;
+
+    public SynchronisationActivity(Context context, RecyclerView recyclerView) {
+        super(context);
+        this.recyclerView = recyclerView;
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +66,7 @@ public class SynchronisationActivity extends AppCompatActivity {
         setContentView(R.layout.synchronisation_activity);
         final Button synchronisation = (Button)findViewById(R.id.sync);
         successOrNot = (TextView) findViewById(R.id.successOrNot);
-        SharedPreferences mShared = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences mShared = PreferenceManager.getDefaultSharedPreferences(getContext());
         lastUpdate = (TextView) findViewById(R.id.lastSync);
         lastUpdate.setText("Last Sync : "+mShared.getString("last_update","unknown"));
         successOrNot.setVisibility(View.INVISIBLE);
@@ -65,6 +76,8 @@ public class SynchronisationActivity extends AppCompatActivity {
         barSend.setVisibility(View.INVISIBLE);
         //barSynchronisation.setVisibility(View.INVISIBLE);
         ServerAdress = (EditText) findViewById(R.id.editAdress);
+        loading = (TextView) findViewById(R.id.loading);
+        loading.setVisibility(View.INVISIBLE);
 
         /*send.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,48 +101,14 @@ public class SynchronisationActivity extends AppCompatActivity {
 
     private void synchronisation() {
         SynchronisationTask s;
-        s = new SynchronisationTask(this, barSend, successOrNot,lastUpdate);
+        s = new SynchronisationTask(getContext(), barSend, successOrNot,lastUpdate, loading, recyclerView);
         s.execute((Void)null);
     }
 
     private void contactServer() {
         SendTask send;
-        send = new SendTask(this,barSend);
+        send = new SendTask(getContext(),barSend);
         send.execute((Void) null);
     }
 
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        if (id == R.id.accueil) {
-            Intent intente = new Intent(SynchronisationActivity.this, PrintContactListActivity.class);
-            startActivity(intente);
-            return true;
-        }
-        if (id == R.id.synchronisation) {
-            Intent intente = new Intent(SynchronisationActivity.this, SynchronisationActivity.class);
-            startActivity(intente);
-            return true;
-        }
-        /*if (id == R.id.journal_appel) {
-            Intent intente = new Intent(SynchronisationActivity.this, ContactActivity.class);
-            startActivity(intente);
-            return true;
-        }*/
-
-        return super.onOptionsItemSelected(item);
-    }
 }

@@ -48,13 +48,13 @@ public class ContactActivity extends AppCompatActivity {
             startActivity(intente);
             return true;
         }
-        if (id == R.id.synchronisation) {
+        /*if (id == R.id.synchronisation) {
             Intent intente = new Intent(ContactActivity.this, SynchronisationActivity.class);
             startActivity(intente);
 
             return true;
         }
-        /*if (id == R.id.journal_appel) {
+        if (id == R.id.journal_appel) {
             Intent intente = new Intent(ContactActivity.this, ContactActivity.class);
             startActivity(intente);
             return true;

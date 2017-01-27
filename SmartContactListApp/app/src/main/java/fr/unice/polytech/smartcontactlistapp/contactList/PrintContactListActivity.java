@@ -52,12 +52,37 @@ public class PrintContactListActivity  extends AppCompatActivity {
 
     private StaggeredGridLayoutManager gaggeredGridLayoutManager;
     private TextView currentSlotTime;
-
+    private RecyclerView recyclerView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
         initialisation();
+        reloadButton();
+
+    }
+
+    private void reloadButton() {
+        TextView reload1 = (TextView) findViewById(R.id.reload1);
+        TextView reload2 = (TextView) findViewById(R.id.reload2);
+        reload1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openReloadPopup();
+            }
+        });
+        reload2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openReloadPopup();
+            }
+        });
+    }
+
+    private void openReloadPopup() {
+        Dialog d = new SynchronisationActivity(this, recyclerView);
+        d.setTitle("Make a Sync");
+        d.show();
     }
 
     private void initialisation() {
@@ -65,7 +90,7 @@ public class PrintContactListActivity  extends AppCompatActivity {
         Date date = new Date();
         Vector v = new Vector(date,"");
         fillSlotTime(v.getTimeSlot());
-        final RecyclerView recyclerView = (RecyclerView)findViewById(R.id.recycler_view);
+        recyclerView = (RecyclerView)findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
         Button makeSync =(Button)findViewById(R.id.make_Sync);
 
@@ -74,7 +99,7 @@ public class PrintContactListActivity  extends AppCompatActivity {
 
         contact_list_mobile = getListItemData();
         if(init_contact_list_application(this)){
-            reload(recyclerView);
+            reload(recyclerView, this);
             makeSync.setVisibility(View.INVISIBLE);
         }else
         {
@@ -110,6 +135,7 @@ public class PrintContactListActivity  extends AppCompatActivity {
         final Dialog dialog = new Dialog(this);
         dialog.setTitle("Change Slot Time");
         dialog.setContentView(R.layout.pop_up);
+
         final List<String > allSlotTimeAvalaibleToPrint = new ArrayList<>();
         final List<String > allSlotTimeAvalaible = new ArrayList<>();
         Date today = new Date();
@@ -135,7 +161,7 @@ public class PrintContactListActivity  extends AppCompatActivity {
         gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                loadslotime(recyclerView, position,allSlotTimeAvalaible);
+                loadslotime(position,allSlotTimeAvalaible);
                 dialog.dismiss();
 
             }
@@ -143,18 +169,18 @@ public class PrintContactListActivity  extends AppCompatActivity {
         dialog.show();
     }
 
-    private void loadslotime(RecyclerView recyclerView, int position, List<String > allSlotTimeAvalaible) {
+    private void loadslotime(int position, List<String > allSlotTimeAvalaible) {
         for(int i=0; i<allSlotTimeAvalaible.size(); i++){
             Log.d("SlotTime", allSlotTimeAvalaible.get(i)+" position : "+position);
         }
         if(loadFile(allSlotTimeAvalaible.get(position), this)) {
             fillSlotTime(allSlotTimeAvalaible.get(position));
-            reload(recyclerView);
+            reload(recyclerView, this);
         }
     }
 
-    private void reload(RecyclerView recyclerView) {
-        SolventRecyclerViewAdapter rcAdapter = new SolventRecyclerViewAdapter(this, contact_list_application);
+    public static void reload(RecyclerView recyclerView, Context context) {
+        SolventRecyclerViewAdapter rcAdapter = new SolventRecyclerViewAdapter(context, contact_list_application);
         recyclerView.swapAdapter(rcAdapter,false);
     }
 
@@ -190,11 +216,11 @@ public class PrintContactListActivity  extends AppCompatActivity {
             startActivity(intente);
             return true;
         }
-        if (id == R.id.synchronisation) {
+        /*if (id == R.id.synchronisation) {
             Intent intente = new Intent(PrintContactListActivity.this, SynchronisationActivity.class);
             startActivity(intente);
             return true;
-        }
+        }*/
         /*if (id == R.id.journal_appel) {
             Intent intente = new Intent(PrintContactListActivity.this, ContactActivity.class);
             startActivity(intente);

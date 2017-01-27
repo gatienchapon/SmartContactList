@@ -11,12 +11,12 @@
         android:id="@+id/journal_appel"
         android:orderInCategory="100"
         android:title="Journal Appels"
-        app:showAsAction="never" />-->
+        app:showAsAction="never" />
     <item
         android:id="@+id/synchronisation"
         android:orderInCategory="100"
         android:title="Sync"
-        app:showAsAction="never" />
+        app:showAsAction="never" />-->
     <!--<item
         android:id="@+id/actualiser"
         android:orderInCategory="100"
