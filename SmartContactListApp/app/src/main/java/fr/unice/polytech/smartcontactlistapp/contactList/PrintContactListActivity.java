@@ -52,7 +52,10 @@ public class PrintContactListActivity  extends AppCompatActivity {
 
     private StaggeredGridLayoutManager gaggeredGridLayoutManager;
     private TextView currentSlotTime;
+    private TextView reload1;
+    private TextView reload2;
     private RecyclerView recyclerView;
+    private Button makeSync;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,8 +66,7 @@ public class PrintContactListActivity  extends AppCompatActivity {
     }
 
     private void reloadButton() {
-        TextView reload1 = (TextView) findViewById(R.id.reload1);
-        TextView reload2 = (TextView) findViewById(R.id.reload2);
+
         reload1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -85,14 +87,22 @@ public class PrintContactListActivity  extends AppCompatActivity {
         d.show();
     }
 
-    private void initialisation() {
+    private void openSyncPopupForTheFirstTime(){
+        Dialog d = new SynchronisationActivity(this, recyclerView, currentSlotTime, reload1, reload2, makeSync);
+        d.setTitle("Make a Sync");
+        d.show();
+    }
+
+    public void initialisation() {
         currentSlotTime = (TextView) findViewById(R.id.currentSlotTime);
+        reload1 = (TextView) findViewById(R.id.reload1);
+        reload2 = (TextView) findViewById(R.id.reload2);
         Date date = new Date();
         Vector v = new Vector(date,"");
         fillSlotTime(v.getTimeSlot());
         recyclerView = (RecyclerView)findViewById(R.id.recycler_view);
         recyclerView.setHasFixedSize(true);
-        Button makeSync =(Button)findViewById(R.id.make_Sync);
+        makeSync =(Button)findViewById(R.id.make_Sync);
 
         gaggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
         recyclerView.setLayoutManager(gaggeredGridLayoutManager);
@@ -105,13 +115,15 @@ public class PrintContactListActivity  extends AppCompatActivity {
         {
             currentSlotTime.setVisibility(View.INVISIBLE);
             recyclerView.setVisibility(View.INVISIBLE);
+            reload1.setVisibility(View.INVISIBLE);
+            reload2.setVisibility(View.INVISIBLE);
             makeSync.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Intent intente = new Intent(PrintContactListActivity.this, SynchronisationActivity.class);
-                    startActivity(intente);
+                    openSyncPopupForTheFirstTime();
                 }
             });
+
 
         }
         currentSlotTime.setOnClickListener(new View.OnClickListener() {
@@ -183,6 +195,7 @@ public class PrintContactListActivity  extends AppCompatActivity {
         SolventRecyclerViewAdapter rcAdapter = new SolventRecyclerViewAdapter(context, contact_list_application);
         recyclerView.swapAdapter(rcAdapter,false);
     }
+
 
     @Override
     protected void onResume() {

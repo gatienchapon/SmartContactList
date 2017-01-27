@@ -54,9 +54,23 @@ public class SynchronisationActivity extends Dialog {
     public static String ipAdress="192.168.1.145";
     private RecyclerView recyclerView;
 
+    TextView currentSlotTime;
+    TextView reload1;
+    TextView reload2;
+    Button makeSync;
+
     public SynchronisationActivity(Context context, RecyclerView recyclerView) {
         super(context);
         this.recyclerView = recyclerView;
+
+    }
+
+    public SynchronisationActivity(Context context, RecyclerView recyclerView, TextView currentSlotTime, TextView reload1, TextView reload2, Button makeSync) {
+        this(context,recyclerView);
+        this.reload1 = reload1;
+        this.reload2 = reload2;
+        this.makeSync = makeSync;
+        this.currentSlotTime = currentSlotTime;
 
     }
 
@@ -101,7 +115,7 @@ public class SynchronisationActivity extends Dialog {
 
     private void synchronisation() {
         SynchronisationTask s;
-        s = new SynchronisationTask(getContext(), barSend, successOrNot,lastUpdate, loading, recyclerView);
+        s = new SynchronisationTask(getContext(), barSend, successOrNot,lastUpdate, loading, recyclerView, reload1, reload2, makeSync, currentSlotTime);
         s.execute((Void)null);
     }
 

@@ -7,6 +7,7 @@ import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -31,6 +32,7 @@ import java.util.Map;
 
 import fr.unice.polytech.smartcontactlistapp.localHistoryManager.Vector;
 
+import static fr.unice.polytech.smartcontactlistapp.DB.DB.init_contact_list_application;
 import static fr.unice.polytech.smartcontactlistapp.DB.DB.synchronise_contact_list_application;
 import static fr.unice.polytech.smartcontactlistapp.contactList.PrintContactListActivity.reload;
 
@@ -46,7 +48,11 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
     TextView loading;
     private Map<String,String> coorspondanceIDContact;
     RecyclerView recyclerView;
-    SynchronisationTask(Context context, ProgressBar bar, TextView successOrNot, TextView lastUpdate, TextView loading, RecyclerView recyclerView) {
+    TextView reload1;
+    TextView reload2;
+    Button makeSync;
+    TextView currentSlotTime;
+    SynchronisationTask(Context context, ProgressBar bar, TextView successOrNot, TextView lastUpdate, TextView loading, RecyclerView recyclerView, TextView reload1, TextView reload2, Button makeSync, TextView currentSlotTime) {
         this.context = context;
         this.bar = bar;
         this.successOrNot = successOrNot;
@@ -54,6 +60,10 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
         coorspondanceIDContact = new HashMap<>();
         this.loading = loading;
         this.recyclerView = recyclerView;
+        this.reload1 = reload1;
+        this.reload2 = reload2;
+        this.makeSync = makeSync;
+        this.currentSlotTime = currentSlotTime;
     }
 
     @Override
@@ -291,6 +301,14 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
         successOrNot.setVisibility(View.VISIBLE);
         bar.setVisibility(View.INVISIBLE);
         loading.setVisibility(View.INVISIBLE);
+        if(reload1 != null){
+            init_contact_list_application(context);
+            reload1.setVisibility(View.VISIBLE);
+            reload2.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.VISIBLE);
+            makeSync.setVisibility(View.INVISIBLE);
+            currentSlotTime.setVisibility(View.VISIBLE);
+        }
         reload(recyclerView,context);
     }
 
