@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import fr.unice.polytech.smartcontactlistapp.R;
 import fr.unice.polytech.smartcontactlistapp.localHistoryManager.Vector;
 
 import static fr.unice.polytech.smartcontactlistapp.DB.DB.init_contact_list_application;
@@ -87,7 +88,6 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
         try {
             in = new FileInputStream(file);
             in.read(bytes);
-            Log.d("File read", new String(bytes));
             in.close();
         } catch (FileNotFoundException e) {
             found = false;
@@ -135,7 +135,7 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
 
         URL url = null;
         try {
-            Log.d("DEBUG", "ipadress dans task :"+SynchronisationActivity.ipAdress+" ");
+            //Log.d("DEBUG", "ipadress dans task :"+SynchronisationActivity.ipAdress+" ");
             // url = new URL("http://"+SynchronisationActivity.ipAdress+":5000/predict/");
             url = new URL("http://gatienchapon.pythonanywhere.com/predict/");
             //Log.d("HOST","http://"+SynchronisationActivity.ipAdress+":5000/predict/");
@@ -278,7 +278,7 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected void onPostExecute(final Boolean success) {
         if (success) {
-            successOrNot.setText("Sync Succeed !");
+            successOrNot.setText(context.getResources().getString(R.string.sucess));
 
             SharedPreferences mShared;
             SharedPreferences.Editor mEdit;
@@ -291,12 +291,12 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
             if(v.month.length() == 1){
                 v.month ="0"+v.month;
             }
-            mEdit.putString("last_update", v.numberDay+"/"+v.month+"/"+v.year+" at "+v.hour+":"+v.minute);
+            mEdit.putString("last_update", v.numberDay+"/"+v.month+"/"+v.year+" "+context.getResources().getString(R.string.at)+" "+v.hour+":"+v.minute);
             mEdit.commit();
 
-            lastUpdate.setText("Last Sync : "+v.numberDay+"/"+v.month+"/"+v.year+" at "+v.hour+":"+v.minute);
+            lastUpdate.setText(context.getResources().getString(R.string.last_sych)+v.numberDay+"/"+v.month+"/"+v.year+" "+context.getResources().getString(R.string.at)+" "+v.hour+":"+v.minute);
         } else {
-            successOrNot.setText("Sync Failed !");
+            successOrNot.setText(context.getResources().getString(R.string.fail));
         }
         successOrNot.setVisibility(View.VISIBLE);
         bar.setVisibility(View.INVISIBLE);

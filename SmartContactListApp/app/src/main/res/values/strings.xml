@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">Smart Contact List</string>
+    <string name="make_sync">Make a Sync</string>
+    <string name="current_period">Current period :</string>
+    <string name="to">to</string>
+    <string name="change_slot_time">Change Slot Time</string>
+    <string name="last_sych">Last Sync :</string>
+    <string name="unknown">unknown</string>
+    <string name="sucess">Sync Succeed !</string>
+    <string name="fail">Sync Failed !</string>
+    <string name="at">at</string>
+    <string name="ip_enter">Enter the server IP adress:</string>
+    <string name="server_adresse">adresse serveur</string>
+    <string name="sync">Sync</string>
+    <string name="loading">Loading ...</string>
+
 </resources>

@@ -5,7 +5,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="Last Sync : "
+        android:text="@string/last_sych"
         android:paddingRight="8dp"
         android:drawablePadding="8dp"
         android:gravity="center"
@@ -19,7 +19,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Enter the server IP adress:"
+        android:text="@string/ip_enter"
         android:layout_margin="15dp"
         android:id="@+id/ipText"
         android:visibility="invisible"/>
@@ -28,7 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/ipText"
         android:text="192.168."
-        android:hint="adresse serveur"
+        android:hint="@string/server_adresse"
         android:id="@+id/editAdress"
         android:visibility="invisible"/>
 
@@ -39,7 +39,7 @@
         android:background="@drawable/circle"
         android:drawableTop="@android:drawable/ic_popup_sync"
         android:paddingTop="20dp"
-        android:text="Sync"
+        android:text="@string/sync"
         android:id="@+id/sync"
         android:layout_below="@id/lastSync"
         android:layout_centerHorizontal="true"
@@ -55,7 +55,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sync Success !"
+        android:text="@string/sucess"
         android:layout_margin="15dp"
         android:textColor="@color/red"
         android:layout_below="@id/sync"
@@ -64,7 +64,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Loading ..."
+        android:text="@string/loading"
         android:layout_margin="15dp"
         android:textColor="@color/red"
         android:layout_below="@id/progressSend"

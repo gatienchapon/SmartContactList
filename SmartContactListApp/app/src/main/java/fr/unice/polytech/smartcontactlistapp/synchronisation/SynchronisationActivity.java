@@ -82,7 +82,7 @@ public class SynchronisationActivity extends Dialog {
         successOrNot = (TextView) findViewById(R.id.successOrNot);
         SharedPreferences mShared = PreferenceManager.getDefaultSharedPreferences(getContext());
         lastUpdate = (TextView) findViewById(R.id.lastSync);
-        lastUpdate.setText("Last Sync : "+mShared.getString("last_update","unknown"));
+        lastUpdate.setText(getContext().getResources().getString(R.string.last_sych)+" "+mShared.getString("last_update",getContext().getResources().getString(R.string.unknown)));
         successOrNot.setVisibility(View.INVISIBLE);
         //Button send = (Button)findViewById(R.id.send_button);
         barSend = (ProgressBar)findViewById(R.id.progressSend);

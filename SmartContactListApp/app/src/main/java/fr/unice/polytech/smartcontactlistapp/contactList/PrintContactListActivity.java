@@ -83,13 +83,13 @@ public class PrintContactListActivity  extends AppCompatActivity {
 
     private void openReloadPopup() {
         Dialog d = new SynchronisationActivity(this, recyclerView);
-        d.setTitle("Make a Sync");
+        d.setTitle(getResources().getString(R.string.make_sync));
         d.show();
     }
 
     private void openSyncPopupForTheFirstTime(){
         Dialog d = new SynchronisationActivity(this, recyclerView, currentSlotTime, reload1, reload2, makeSync);
-        d.setTitle("Make a Sync");
+        d.setTitle(getResources().getString(R.string.make_sync));
         d.show();
     }
 
@@ -140,12 +140,12 @@ public class PrintContactListActivity  extends AppCompatActivity {
         Vector v = new Vector(slotTime);
         String begin =v.getBeginEndSlotTime()[0];
         String end =v.getBeginEndSlotTime()[1];
-        currentSlotTime.setText("Current period : "+begin+":00 to "+end+":00");
+        currentSlotTime.setText(getResources().getString(R.string.current_period)+begin+":00 "+getResources().getString(R.string.to)+" "+end+":00");
     }
 
     private void openPupUp(final RecyclerView recyclerView) {
         final Dialog dialog = new Dialog(this);
-        dialog.setTitle("Change Slot Time");
+        dialog.setTitle(getResources().getString(R.string.change_slot_time));
         dialog.setContentView(R.layout.pop_up);
 
         final List<String > allSlotTimeAvalaibleToPrint = new ArrayList<>();
@@ -158,13 +158,13 @@ public class PrintContactListActivity  extends AppCompatActivity {
             String begin =v.getBeginEndSlotTime()[0];
             String end =v.getBeginEndSlotTime()[1];
             allSlotTimeAvalaible.add(v.getTimeSlot());
-            allSlotTimeAvalaibleToPrint.add(begin+":00 to "+end+":00");
+            allSlotTimeAvalaibleToPrint.add(begin+":00 "+getResources().getString(R.string.to)+" "+end+":00");
         }
         v.fillTimeSlot(1);
         String begin =v.getBeginEndSlotTime()[0];
         String end =v.getBeginEndSlotTime()[1];
         allSlotTimeAvalaible.add(v.getTimeSlot());
-        allSlotTimeAvalaibleToPrint.add(begin+":00 to "+end+":00");
+        allSlotTimeAvalaibleToPrint.add(begin+":00 "+getResources().getString(R.string.to)+" "+end+" :00");
         ArrayAdapter<String> itemsAdapter =
                 new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, allSlotTimeAvalaibleToPrint);
 
@@ -182,9 +182,6 @@ public class PrintContactListActivity  extends AppCompatActivity {
     }
 
     private void loadslotime(int position, List<String > allSlotTimeAvalaible) {
-        for(int i=0; i<allSlotTimeAvalaible.size(); i++){
-            Log.d("SlotTime", allSlotTimeAvalaible.get(i)+" position : "+position);
-        }
         if(loadFile(allSlotTimeAvalaible.get(position), this)) {
             fillSlotTime(allSlotTimeAvalaible.get(position));
             reload(recyclerView, this);

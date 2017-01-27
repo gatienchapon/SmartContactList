@@ -41,8 +41,6 @@ public class DB {
     public static boolean loadFile(String timeSlot, Context context) {
         File path = context.getFilesDir();
         File file = new File(path, timeSlot+"contact_list_application.txt");
-        //file.delete();
-        //si le fichier est vide on le complete avec la liste de contact
         if(file.length() == 0){
             /*for(int i=0; i<contact_list_mobile.size(); i++){
                 Contact c = contact_list_mobile.get(i);

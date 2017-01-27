@@ -48,7 +48,7 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/make_Sync"
-        android:text="Make a Sync"
+        android:text="@string/make_sync"
         android:gravity="center"
         android:drawableLeft="@android:drawable/ic_popup_sync"/>
     <android.support.v7.widget.RecyclerView

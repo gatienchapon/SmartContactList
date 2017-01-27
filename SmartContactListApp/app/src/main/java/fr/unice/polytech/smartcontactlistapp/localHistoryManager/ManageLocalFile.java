@@ -128,6 +128,5 @@ public class ManageLocalFile {
             e.printStackTrace();
         }
         String contenu = new String(readFile());
-        Log.d("Content", contenu);
     }
 }
