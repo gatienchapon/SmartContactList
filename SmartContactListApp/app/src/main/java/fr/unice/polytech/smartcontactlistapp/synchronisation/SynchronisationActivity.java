@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -112,11 +113,27 @@ public class SynchronisationActivity extends Dialog {
                 if ( ! TextUtils.isEmpty(ServerAdress.getText().toString())){
                     ipAdress = ServerAdress.getText().toString();
                 }
-                synchronisation();
+                if(checkInternetConnection()){
+                    synchronisation();
+                }else{
+                    successOrNot.setVisibility(View.VISIBLE);
+                    successOrNot.setText(getContext().getResources().getString(R.string.noInternet));
+                }
+
             }
         });
     }
 
+    private boolean checkInternetConnection() {
+        ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm.getActiveNetworkInfo() != null
+                && cm.getActiveNetworkInfo().isAvailable()
+                && cm.getActiveNetworkInfo().isConnected()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     private void synchronisation() {
         SynchronisationTask s;
         Map<String, Contact> contact_list_mobile = new HashMap<>();

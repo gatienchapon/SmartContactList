@@ -2,6 +2,7 @@ package fr.unice.polytech.smartcontactlistapp.synchronisation;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 import android.support.v7.widget.RecyclerView;
@@ -81,6 +82,7 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
         loading.setVisibility(View.VISIBLE);
         successOrNot.setVisibility(View.INVISIBLE);
     }
+
 
     @Override
     protected Boolean doInBackground(Void... params) {
