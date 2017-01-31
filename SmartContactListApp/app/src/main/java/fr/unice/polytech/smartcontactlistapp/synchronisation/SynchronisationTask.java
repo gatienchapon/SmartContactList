@@ -29,8 +29,10 @@ import java.text.Normalizer;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 import fr.unice.polytech.smartcontactlistapp.R;
+import fr.unice.polytech.smartcontactlistapp.contactList.Contact;
 import fr.unice.polytech.smartcontactlistapp.localHistoryManager.Vector;
 
 import static fr.unice.polytech.smartcontactlistapp.DB.DB.init_contact_list_application;
@@ -53,7 +55,10 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
     TextView reload2;
     Button makeSync;
     TextView currentSlotTime;
-    SynchronisationTask(Context context, ProgressBar bar, TextView successOrNot, TextView lastUpdate, TextView loading, RecyclerView recyclerView, TextView reload1, TextView reload2, Button makeSync, TextView currentSlotTime) {
+    Semaphore semContact;
+    Semaphore semServer;
+    Map<String, Contact> contact_list_mobile;
+    SynchronisationTask(Context context, ProgressBar bar, TextView successOrNot, TextView lastUpdate, TextView loading, RecyclerView recyclerView, TextView reload1, TextView reload2, Button makeSync, TextView currentSlotTime, Semaphore semaphore1, Map<String, Contact> contact_list_mobile, Semaphore semaphore2) {
         this.context = context;
         this.bar = bar;
         this.successOrNot = successOrNot;
@@ -65,6 +70,9 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
         this.reload2 = reload2;
         this.makeSync = makeSync;
         this.currentSlotTime = currentSlotTime;
+        semContact = semaphore1;
+        semServer = semaphore2;
+        this.contact_list_mobile = contact_list_mobile;
     }
 
     @Override
@@ -155,7 +163,10 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
             Log.d("To send ", json.toString());
 
             contentSend.writeBytes(json.toString());
-
+            Log.d("ServerRespon","On attend contactList");
+            semContact.acquire();
+            Log.d("ServerRespon","On acquire");
+            semServer.release();
             int statusCode = connection.getResponseCode();
             if(statusCode == 200) {
                 BufferedReader content = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -165,7 +176,8 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
                     responseStrBuilder.append(inputStr);
                 JSONObject j = new JSONObject(responseStrBuilder.toString());
                 Log.d("JSON", j.toString());
-                synchronise_contact_list_application(j, context, coorspondanceIDContact);
+
+                synchronise_contact_list_application(j, context, coorspondanceIDContact, contact_list_mobile);
                 content.close();
             }else{
                 contentSend.close();
@@ -182,6 +194,8 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
         } catch (JSONException e) {
             e.printStackTrace();
             return false;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
         return true;
     }

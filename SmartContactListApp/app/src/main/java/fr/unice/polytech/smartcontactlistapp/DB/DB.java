@@ -28,7 +28,6 @@ import fr.unice.polytech.smartcontactlistapp.localHistoryManager.Vector;
 
 public class DB {
     public static List<Contact> contact_list_application;
-    public static List<Contact> contact_list_mobile;
 
 
     public static boolean init_contact_list_application(Context context){
@@ -62,12 +61,12 @@ public class DB {
         }
     }
 
-    public static void synchronise_contact_list_application(JSONObject json, Context context, Map<String, String> coorspondanceIDContact) {
+    public static void synchronise_contact_list_application(JSONObject json, Context context, Map<String, String> coorspondanceIDContact, Map<String, Contact> contact_list_mobile) {
         Date date = new Date();
         Vector v = new Vector(date,"");
         String[] slots = {"810", "1012", "1214", "1416", "1618", "1820", "2022", "2200", "6", "608"};
         for ( String s : slots){
-            writeAllFiles(s, json, context, coorspondanceIDContact);
+            writeAllFiles(s, json, context, coorspondanceIDContact, contact_list_mobile);
         }
         loadCurrentTimeSlot(v.getTimeSlot(),context);
     }
@@ -85,7 +84,7 @@ public class DB {
 
     }
 
-    private static void writeAllFiles(String timeSlot, JSONObject json, Context context, Map<String, String> coorspondanceIDContact) {
+    private static void writeAllFiles(String timeSlot, JSONObject json, Context context, Map<String, String> coorspondanceIDContact, Map<String, Contact> contact_list_mobile) {
         File path = context.getFilesDir();
         String fileName = timeSlot+"contact_list_application.txt";
         File file = new File(path, fileName);
@@ -101,16 +100,13 @@ public class DB {
                 String id = jsonObject.getString("name");
                   String name = coorspondanceIDContact.get(id);
                 String numero = "";
-                for (Contact c : contact_list_mobile) {
-                    String nameMobile = c.name;
-                    if (nameMobile.equals(name)) {
-                        numero = c.numero;
-                        Contact contact = new Contact(name, numero, result + "%");
-                        String ligne = contact.name + "," + contact.numero + "," + contact.percentage + "\n";
-                        writeToFile(file, ligne, erase);
-                        erase = false;
-                    }
-                }
+                  if (contact_list_mobile.containsKey(name)){
+                      Contact c = contact_list_mobile.get(name);
+                      Contact contact = new Contact(name, c.numero, result + "%");
+                      String ligne = contact.name + "," + contact.numero + "," + contact.percentage + "\n";
+                      writeToFile(file, ligne, erase);
+                      erase = false;
+                  }
 
             }
             } catch (JSONException e) {

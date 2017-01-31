@@ -14,7 +14,6 @@ import java.util.List;
 import fr.unice.polytech.smartcontactlistapp.R;
 
 import static fr.unice.polytech.smartcontactlistapp.DB.DB.contact_list_application;
-import static fr.unice.polytech.smartcontactlistapp.DB.DB.contact_list_mobile;
 
 public class SolventViewHolders extends RecyclerView.ViewHolder implements View.OnClickListener {
 

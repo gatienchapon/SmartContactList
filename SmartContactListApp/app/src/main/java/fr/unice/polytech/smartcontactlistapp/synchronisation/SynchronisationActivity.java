@@ -36,8 +36,12 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 import fr.unice.polytech.smartcontactlistapp.R;
+import fr.unice.polytech.smartcontactlistapp.contactList.Contact;
 import fr.unice.polytech.smartcontactlistapp.contactList.PrintContactListActivity;
 import fr.unice.polytech.smartcontactlistapp.historyList.ContactActivity;
 import fr.unice.polytech.smartcontactlistapp.historyList.ContactAdapter;
@@ -115,8 +119,15 @@ public class SynchronisationActivity extends Dialog {
 
     private void synchronisation() {
         SynchronisationTask s;
-        s = new SynchronisationTask(getContext(), barSend, successOrNot,lastUpdate, loading, recyclerView, reload1, reload2, makeSync, currentSlotTime);
-        s.execute((Void)null);
+        Map<String, Contact> contact_list_mobile = new HashMap<>();
+        Semaphore semaphore1 = new Semaphore(0);
+        Semaphore semaphore2 = new Semaphore(0);
+        s = new SynchronisationTask(getContext(), barSend, successOrNot,lastUpdate, loading, recyclerView, reload1, reload2, makeSync, currentSlotTime, semaphore1, contact_list_mobile, semaphore2);
+        SyncContactListTask syncContactListTask;
+        syncContactListTask = new SyncContactListTask(semaphore1, semaphore2, contact_list_mobile, getContext());
+        s.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        syncContactListTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
     }
 
     private void contactServer() {

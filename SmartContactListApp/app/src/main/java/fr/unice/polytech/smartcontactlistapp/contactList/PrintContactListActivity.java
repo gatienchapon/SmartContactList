@@ -32,6 +32,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 
 import fr.unice.polytech.smartcontactlistapp.R;
 import fr.unice.polytech.smartcontactlistapp.historyList.ContactActivity;
@@ -40,7 +41,6 @@ import fr.unice.polytech.smartcontactlistapp.localHistoryManager.Vector;
 import fr.unice.polytech.smartcontactlistapp.synchronisation.SynchronisationActivity;
 
 import static fr.unice.polytech.smartcontactlistapp.DB.DB.contact_list_application;
-import static fr.unice.polytech.smartcontactlistapp.DB.DB.contact_list_mobile;
 import static fr.unice.polytech.smartcontactlistapp.DB.DB.init_contact_list_application;
 import static fr.unice.polytech.smartcontactlistapp.DB.DB.loadFile;
 
@@ -107,7 +107,6 @@ public class PrintContactListActivity  extends AppCompatActivity {
         gaggeredGridLayoutManager = new StaggeredGridLayoutManager(2, 1);
         recyclerView.setLayoutManager(gaggeredGridLayoutManager);
 
-        contact_list_mobile = getListItemData();
         if(init_contact_list_application(this)){
             reload(recyclerView, this);
             makeSync.setVisibility(View.INVISIBLE);
@@ -198,13 +197,6 @@ public class PrintContactListActivity  extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         initialisation();
-    }
-
-    private List<Contact> getListItemData(){
-        RetreiveContactList retreiveContactList= new RetreiveContactList();
-        retreiveContactList.fillContactHistory(this);
-        List<Contact> list = retreiveContactList.getListContact();
-        return list;
     }
 
     @Override
