@@ -4,112 +4,107 @@ import distutils.dir_util
 from sklearn.ensemble import RandomForestClassifier
 
 
-def getNbCallForAContactForAGivenSlotTime(currentClass, corespondant, slotTimeCurrent):
-    for contact in corespondant:
-        if contact['numero'] == currentClass:
-            return contact[slotTimeCurrent]
-
-def count_for_a_slottime(allSlots, allClass, numero, currentSlotTime):
-    i=0
-    result = 0
-    for one_slot in allSlots:
-        if one_slot == currentSlotTime:
-            if allClass[i] == numero:
-                result = result + 1
-        i = i+1
-    return result
-
-
-def initAllContactNbCallBySlotTime(train, uniqueClassList):
-    for uniqueCall in uniqueClassList:
-        train[str(uniqueCall)] =0
-
-
-def fillTestFile(test, path, correspondance):
-
-    id_Contact = correspondance['numero']
-    initAllContactNbCallBySlotTime(test, id_Contact)
-
-    slottime_target = test['SlotTime'][0]
-    allSlotTimes = [6,608,810,1012,1214,1416,1618,1820,2022,2200]
-    hours = {'6':'00','608':'06','810':'08','1012':'10','1214':'12','1416':'14','1618':'16','1820':'18','2022':'22','2200':'22'}
-    j=0
-    for contact_current in id_Contact:
-        test[str(contact_current)][0] = correspondance[str(slottime_target)][j]
-        j=j+1
-    for current_slot_time in allSlotTimes:
-        if slottime_target != current_slot_time:
-            line = {}
-            for t in test:
-                if t != 'SlotTime' and t !='Hour':
-                    line[str(t)] = test[str(t)][0]
-            line['SlotTime'] = current_slot_time
-            line['Hour'] = hours[str(current_slot_time)]
-            j =0
-            for contact_current in id_Contact:
-                line[str(contact_current)] = correspondance[str(current_slot_time)][j]
-                j=j+1
-            test =test.append(line, ignore_index=True)
-    return test
-
 class randomForest:
-    def __init__(self):
+    def __init__(self, path):
         self.random_forest = RandomForestClassifier(n_estimators=100)
+        self.path = path
+        self.train = pd.read_csv(path+'/train.txt')
+        self.classConcatTimeSlot = dict()
+        self.classFind = set()
+        self.correspondance = []
+        self.testComplet = []
+        self.test = pd.read_csv(path+'/testFile.txt')
 
-    def classify(self, path):
-		fileToRead = path+'/test.txt'
-		train = pd.read_csv(fileToRead)
-		allClass = train['Class']
-		uniqueClassList = list(set(allClass))
-		allSlotTime = [6,608,810,1012,1214,1416,1618,1820,2022,2200]
-		corespondant = []
-		i=1
-		for unique in uniqueClassList:
-			corespondant.append({"numero":i, "name":unique})
-			allClass = [ i if x == unique else x for x in allClass ]
-			i=i+1
-		i=0
-		for contact in corespondant:
-			for currentSlotTime in allSlotTime:
-				count = count_for_a_slottime(train['SlotTime'],allClass,contact['numero'],currentSlotTime)
-				corespondant[i][currentSlotTime] = count
-			i=i+1
-		uniqueClassList = list(set(allClass))
-		
-		i=0
-		initAllContactNbCallBySlotTime(train, uniqueClassList)
-		for current_line in train['SlotTime']:
-			for current in allClass:
-				nbCall = getNbCallForAContactForAGivenSlotTime(current,corespondant, current_line)
-				train[str(current)][str(i)]= nbCall
-			i=i+1
-		df = pd.DataFrame(data = train)
-		df.to_csv(fileToRead,index=False)
-		df = pd.DataFrame(data = corespondant)
-		df.to_csv(path+'/correspondance.txt',index=False)
-		train.drop(['Class'], axis=1, inplace=True)
-		self.random_forest.fit(train, allClass)
+    def fillCorrespondanceFile(self):
+        allSlotTime = [6,608,810,1012,1214,1416,1618,1820,2022,2200]
+        for index, row in self.train.iterrows():
+            currentTrainSlotTime = row['SlotTime']
+            currentClass = row['Class']
+            concat = currentClass+str(currentTrainSlotTime)
+            self.classFind.add(currentClass)
+            if( self.classConcatTimeSlot.has_key(concat)):
+                value =  self.classConcatTimeSlot.get(concat)
+                self.classConcatTimeSlot[concat]= value+1
+            else:
+                self.classConcatTimeSlot[concat]=1
+        for contact in  self.classFind:
+            line ={}
+            line['Class'] = contact
+            for timeSlot in allSlotTime:
+                key = contact+str(timeSlot)
+                if( self.classConcatTimeSlot.has_key(key)):
+                    line[str(timeSlot)] =  self.classConcatTimeSlot.get(key)
+                else:
+                    line[str(timeSlot)] = 0
+            self.correspondance.append(line)
+        df = pd.DataFrame(data = self.correspondance)
+        df.to_csv(self.path+'/correspondance.txt',index=False)
 
-    def predicte(self, path):
-		
-		LocationTest = path+'/testFile.txt'
-		test = pd.read_csv(LocationTest)
-		correspondance = pd.read_csv(path+'/correspondance.txt')
-		test = fillTestFile(test, path, correspondance)
-		resultatFinal = {}
-		for index, row in test.iterrows():
-			currentSlotTime = row['SlotTime']
-			row = row.reshape(1,-1)
-			Y_pred = self.random_forest.predict_proba(row)
-			names = correspondance['name']
-			i =0
-			resultatFinal[str(currentSlotTime)] = []
-			for proba in Y_pred[0]:
-				if(proba != 0):
-					resultatFinal[str(currentSlotTime)].append({"name":names[i],"score":proba})
-				i=i+1
-		df = pd.DataFrame(data = test)
-		df.to_csv(path+'/testFile.txt',index=False)
-		#print resultatFinal
-		return resultatFinal
+    def classify(self):
+        self.fillCorrespondanceFile()
+        learning = []
 
+        for index, row in self.train.iterrows():
+            line = row
+            line.pop('Class')
+            slottime_target = row['SlotTime']
+            for contact in  self.classFind:
+                key = contact+str(slottime_target)
+                if( self.classConcatTimeSlot.has_key(key)):
+                    line[contact] =  self.classConcatTimeSlot.get(key)
+                else:
+                    line[contact] = 0
+            learning.append(line)
+        df = pd.DataFrame(data = learning)
+        df.to_csv(self.path+"/learningSet.txt",index=False)
+        allClass = self.train['Class']
+        self.random_forest.fit(learning, allClass)
+
+    def fillTestFile(self):
+        hours = {'6':'00','608':'06','810':'08','1012':'10','1214':'12','1416':'14','1618':'16','1820':'18','2022':'22','2200':'22'}
+        allSlotTimes = [6,608,810,1012,1214,1416,1618,1820,2022,2200]
+        slottime_target = self.test['SlotTime'][0]
+        for current_slot_time in allSlotTimes:
+            if slottime_target != current_slot_time:
+                newLine = {}
+                for t in self.test:
+                    if t != 'SlotTime' and t !='Hour':
+                        newLine[str(t)] = self.test[str(t)][0]
+                newLine['SlotTime'] = current_slot_time
+                newLine['Hour'] = hours[str(current_slot_time)]
+                self.test =self.test.append(newLine, ignore_index=True)
+
+        for index, row in self.test.iterrows():
+            line = row
+            slottime_target = row['SlotTime']
+            for contact in self.classFind:
+                key = contact+str(slottime_target)
+                if( self.classConcatTimeSlot.has_key(key)):
+                    line[contact] =  self.classConcatTimeSlot.get(key)
+                else:
+                    line[contact] = 0
+            self.testComplet.append(line)
+        df = pd.DataFrame(data = self.testComplet)
+        df.to_csv(self.path+"/testComplet.txt",index=False)
+
+    def predicte(self):
+        self.fillTestFile()
+        resultatFinal = {}
+        self.testComplet = pd.read_csv(self.path+'/testComplet.txt')
+        self.correspondance = pd.read_csv(self.path+'/correspondance.txt')
+        for index, row in self.testComplet.iterrows():
+            currentSlotTime = row['SlotTime']
+            row = row.reshape(1,-1)
+            Y_pred = self.random_forest.predict_proba(row)
+            names = self.correspondance['Class']
+            i =0
+            resultatFinal[str(currentSlotTime)] = []
+            for proba in Y_pred[0]:
+                if(proba != 0):
+                    resultatFinal[str(currentSlotTime)].append({"name":names[i],"score":proba})
+                i=i+1
+        return resultatFinal
+
+rand = randomForest("dataset/greg")
+rand.classify()
+rand.predicte()

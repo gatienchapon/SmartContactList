@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -161,7 +162,9 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
             connection.connect();
             DataOutputStream contentSend = new DataOutputStream(connection.getOutputStream());
             Vector v = new Vector(new Date(), "coucou");
-            JSONObject json  = fillJsonArray(v).put("history", jsonHistory);
+            String deviceId = Settings.Secure.getString(context.getContentResolver(),
+                    Settings.Secure.ANDROID_ID);
+            JSONObject json  = fillJsonArray(v).put("history", jsonHistory).put("id_phone", deviceId);
             Log.d("To send ", json.toString());
 
             contentSend.writeBytes(json.toString());
