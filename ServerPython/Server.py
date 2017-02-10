@@ -5,7 +5,7 @@ import pandas as pd
 import distutils.dir_util
 import netifaces as ni
 from randomForest import randomForest
-
+from UDP import UDP
 app = Flask(__name__)
 
 
@@ -45,10 +45,14 @@ def get_tasks():
     distutils.dir_util.remove_tree(path)
     return json
 
+@app.route("/")
+def hello():
+    return "Hello World!"
+
 if __name__ == '__main__':
     #Classifier.classify("dataset/192.168.0.37_folder")
-    #thredUdp = UDP()
-    #thredUdp.start()
+    thredUdp = UDP()
+    thredUdp.start()
     if 2 in ni.ifaddresses('wlan0'):
         print "wlan0 IP : %s" % ni.ifaddresses('wlan0')[2][0]['addr']
     if 2 in ni.ifaddresses('eth0'):
