@@ -27,6 +27,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -62,6 +67,7 @@ public class PrintContactListActivity  extends AppCompatActivity {
         setContentView(R.layout.activity_contact_list);
         initialisation();
         reloadButton();
+
 
     }
 

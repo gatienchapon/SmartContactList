@@ -59,6 +59,7 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
     TextView currentSlotTime;
     Semaphore semContact;
     Semaphore semServer;
+    boolean serverUnreachable= false;
     Map<String, Contact> contact_list_mobile;
     SynchronisationTask(Context context, ProgressBar bar, TextView successOrNot, TextView lastUpdate, TextView loading, RecyclerView recyclerView, TextView reload1, TextView reload2, Button makeSync, TextView currentSlotTime, Semaphore semaphore1, Map<String, Contact> contact_list_mobile, Semaphore semaphore2) {
         this.context = context;
@@ -88,124 +89,132 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... params) {
         //Obtention de l'ip du serveur local
-       // sendUDPRequest();
-        //Lecture du fichier
-        File path = context.getFilesDir();
-        File file = new File(path, "historyCall.txt");
-        int length = (int) file.length();
-        byte[] bytes = new byte[length];
-        boolean found = true;
-        FileInputStream in = null;
-        try {
-            in = new FileInputStream(file);
-            in.read(bytes);
-            in.close();
-        } catch (FileNotFoundException e) {
-            found = false;
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        JSONArray jsonHistory = null;
-        if(!found){
-            String history = "Maman,7,7,15,38,1,46,1416,2017\n" +
-                    "Jean Dupuis,7,7,14,31,1,5,1416,2017\n" +
-                    "Stéphane Lebon,7,7,14,30,1,44,1416,2017\n" +
-                    "Gaëtan Bertot,7,7,12,10,1,15,1214,2017\n" +
-                    "Gaëtan Bertot,7,7,11,16,1,11,1012,2017\n" +
-                    "Hélène Guillot,7,7,11,13,1,31,1012,2017\n" +
-                    "Michelle Jaccob,7,7,11,11,1,46,1012,2017\n" +
-                    "Hubert de la Croix,7,7,10,59,1,23,1012,2017\n" +
-                    "Pierre Perrin,7,7,10,46,1,14,1012,2017\n" +
-                    "Pépé,7,7,10,41,1,4,1012,2017\n" +
-                    "Mémé,7,7,10,40,1,41,1012,2017\n" +
-                    "Repondeur,7,7,10,38,1,46,1012,2017\n" +
-                    "Yann Goubert,7,7,10,38,1,30,1012,2017\n" +
-                    "Laura Labruit,7,7,10,36,1,2,1012,2017\n" +
-                    "Laura Labruit,7,7,9,51,1,43,810,2017\n" +
-                    "Papa,7,7,8,33,1,29,810,2017\n" +
-                    "Maman,7,7,8,31,1,36,810,2017\n" +
-                    "Mon Amour,7,7,8,28,1,46,810,2017\n" +
-                    "Mon Amour,7,7,8,27,1,58,810,2017\n" +
-                    "Léa Ravelle,7,7,7,23,1,43,608,2017\n" +
-                    "Léa Ravelle,6,6,22,26,1,39,2200,2017\n" +
-                    "Mon Amour,6,6,20,47,1,24,2022,2017\n" +
-                    "Stéphane Lebon,6,6,19,39,1,14,1820,2017\n" +
-                    "Jean Dupuis,6,6,19,38,1,57,1820,2017\n" +
-                    "Mon Amour,6,6,19,16,1,34,1820,2017\n" +
-                    "Mon Amour,6,6,17,26,1,31,1618,2017\n" +
-                    "Mon Amour,6,6,17,11,1,31,1618,2017\n" +
-                    "Léo Laccroit,6,6,16,54,1,8,1618,2017\n" +
-                    "Mon Amour,6,6,15,51,1,8,1416,2017";
-            String table[] = new String(history.getBytes()).split("\n");
-            jsonHistory = createJson2(table);
-        }else{
-            String[] s= new String(bytes).split("\n");
-            jsonHistory = createJson(s);
-        }
-
-        URL url = null;
-        try {
-            //Log.d("DEBUG", "ipadress dans task :"+SynchronisationActivity.ipAdress+" ");
-            // url = new URL("http://"+SynchronisationActivity.ipAdress+":5000/predict/");
-            url = new URL("http://gatienchapon.pythonanywhere.com/predict/");
-            //Log.d("HOST","http://"+SynchronisationActivity.ipAdress+":5000/predict/");
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestProperty("Content-Type", "application/json");
-            connection.setRequestProperty("Accept", "application/json");
-            connection.setRequestMethod("POST");
-            connection.setRequestMethod("GET");
-            connection.setConnectTimeout(60000);
-            connection.setReadTimeout(60000);
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-            connection.connect();
-            DataOutputStream contentSend = new DataOutputStream(connection.getOutputStream());
-            Vector v = new Vector(new Date(), "coucou");
-            String deviceId = Settings.Secure.getString(context.getContentResolver(),
-                    Settings.Secure.ANDROID_ID);
-            JSONObject json  = fillJsonArray(v).put("history", jsonHistory).put("id_phone", deviceId);
-            Log.d("To send ", json.toString());
-
-            contentSend.writeBytes(json.toString());
-            Log.d("ServerRespon","On attend contactList");
-            semContact.acquire();
-            Log.d("ServerRespon","On acquire");
-            semServer.release();
-            int statusCode = connection.getResponseCode();
-            if(statusCode == 200) {
-                BufferedReader content = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                String inputStr;
-                StringBuilder responseStrBuilder = new StringBuilder();
-                while ((inputStr = content.readLine()) != null)
-                    responseStrBuilder.append(inputStr);
-                JSONObject j = new JSONObject(responseStrBuilder.toString());
-                Log.d("JSON", j.toString());
-
-                synchronise_contact_list_application(j, context, coorspondanceIDContact, contact_list_mobile);
-                content.close();
+        String ipServeur = sendUDPRequest();
+        if(ipServeur != null){
+            //Lecture du fichier
+            File path = context.getFilesDir();
+            File file = new File(path, "historyCall.txt");
+            int length = (int) file.length();
+            byte[] bytes = new byte[length];
+            boolean found = true;
+            FileInputStream in = null;
+            try {
+                in = new FileInputStream(file);
+                in.read(bytes);
+                in.close();
+            } catch (FileNotFoundException e) {
+                found = false;
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            JSONArray jsonHistory = null;
+            if(!found){
+                String history = "Maman,7,7,15,38,1,46,1416,2017\n" +
+                        "Jean Dupuis,7,7,14,31,1,5,1416,2017\n" +
+                        "Stéphane Lebon,7,7,14,30,1,44,1416,2017\n" +
+                        "Gaëtan Bertot,7,7,12,10,1,15,1214,2017\n" +
+                        "Gaëtan Bertot,7,7,11,16,1,11,1012,2017\n" +
+                        "Hélène Guillot,7,7,11,13,1,31,1012,2017\n" +
+                        "Michelle Jaccob,7,7,11,11,1,46,1012,2017\n" +
+                        "Hubert de la Croix,7,7,10,59,1,23,1012,2017\n" +
+                        "Pierre Perrin,7,7,10,46,1,14,1012,2017\n" +
+                        "Pépé,7,7,10,41,1,4,1012,2017\n" +
+                        "Mémé,7,7,10,40,1,41,1012,2017\n" +
+                        "Repondeur,7,7,10,38,1,46,1012,2017\n" +
+                        "Yann Goubert,7,7,10,38,1,30,1012,2017\n" +
+                        "Laura Labruit,7,7,10,36,1,2,1012,2017\n" +
+                        "Laura Labruit,7,7,9,51,1,43,810,2017\n" +
+                        "Papa,7,7,8,33,1,29,810,2017\n" +
+                        "Maman,7,7,8,31,1,36,810,2017\n" +
+                        "Mon Amour,7,7,8,28,1,46,810,2017\n" +
+                        "Mon Amour,7,7,8,27,1,58,810,2017\n" +
+                        "Léa Ravelle,7,7,7,23,1,43,608,2017\n" +
+                        "Léa Ravelle,6,6,22,26,1,39,2200,2017\n" +
+                        "Mon Amour,6,6,20,47,1,24,2022,2017\n" +
+                        "Stéphane Lebon,6,6,19,39,1,14,1820,2017\n" +
+                        "Jean Dupuis,6,6,19,38,1,57,1820,2017\n" +
+                        "Mon Amour,6,6,19,16,1,34,1820,2017\n" +
+                        "Mon Amour,6,6,17,26,1,31,1618,2017\n" +
+                        "Mon Amour,6,6,17,11,1,31,1618,2017\n" +
+                        "Léo Laccroit,6,6,16,54,1,8,1618,2017\n" +
+                        "Mon Amour,6,6,15,51,1,8,1416,2017";
+                String table[] = new String(history.getBytes()).split("\n");
+                jsonHistory = createJson2(table);
             }else{
-                contentSend.close();
-                connection.disconnect();
-                return false;
+                String[] s= new String(bytes).split("\n");
+                jsonHistory = createJson(s);
             }
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-            return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        } catch (JSONException e) {
-            e.printStackTrace();
-            return false;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            URL url = null;
+            try {
+                //Log.d("DEBUG", "ipadress dans task :"+SynchronisationActivity.ipAdress+" ");
+                // url = new URL("http://"+SynchronisationActivity.ipAdress+":5000/predict/");
+                url = new URL("http://"+ipServeur+":5000/predict/");
+                //Log.d("HOST","http://"+SynchronisationActivity.ipAdress+":5000/predict/");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Accept", "application/json");
+                connection.setRequestMethod("POST");
+                connection.setRequestMethod("GET");
+                connection.setConnectTimeout(60000);
+                connection.setReadTimeout(60000);
+                connection.setDoOutput(true);
+                connection.setDoInput(true);
+                connection.connect();
+                DataOutputStream contentSend = new DataOutputStream(connection.getOutputStream());
+                Vector v = new Vector(new Date(), "coucou");
+                String deviceId = Settings.Secure.getString(context.getContentResolver(),
+                        Settings.Secure.ANDROID_ID);
+                JSONObject json  = fillJsonArray(v).put("history", jsonHistory).put("id_phone", deviceId);
+                Log.d("To send ", json.toString());
+
+                contentSend.writeBytes(json.toString());
+                Log.d("ServerRespon","On attend contactList");
+                semContact.acquire();
+                Log.d("ServerRespon","On acquire");
+                semServer.release();
+                int statusCode = connection.getResponseCode();
+                if(statusCode == 200) {
+                    BufferedReader content = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    String inputStr;
+                    StringBuilder responseStrBuilder = new StringBuilder();
+                    while ((inputStr = content.readLine()) != null)
+                        responseStrBuilder.append(inputStr);
+                    JSONObject j = new JSONObject(responseStrBuilder.toString());
+                    Log.d("JSON", j.toString());
+
+                    synchronise_contact_list_application(j, context, coorspondanceIDContact, contact_list_mobile);
+                    content.close();
+                }else{
+                    contentSend.close();
+                    connection.disconnect();
+                    return false;
+                }
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+                return false;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return false;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return true;
         }
-        return true;
+        serverUnreachable = true;
+        return false;
+
     }
 
-
+    private String sendUDPRequest() {
+        UDP udp = new UDP(context);
+        return udp.getServerIpAdress();
+    }
 
 
     /*
@@ -315,7 +324,10 @@ public class SynchronisationTask extends AsyncTask<Void, Void, Boolean> {
 
             lastUpdate.setText(context.getResources().getString(R.string.last_sych)+v.numberDay+"/"+v.month+"/"+v.year+" "+context.getResources().getString(R.string.at)+" "+v.hour+":"+v.minute);
         } else {
-            successOrNot.setText(context.getResources().getString(R.string.fail));
+            if(!serverUnreachable)
+                successOrNot.setText(context.getResources().getString(R.string.fail));
+            else
+                successOrNot.setText(context.getResources().getString(R.string.unreach));
         }
         successOrNot.setVisibility(View.VISIBLE);
         bar.setVisibility(View.INVISIBLE);
